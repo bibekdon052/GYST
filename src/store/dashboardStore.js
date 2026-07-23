@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { ALL_PLATFORMS, getPlatformById } from '../data/platforms'
 import { TEMPLATES } from '../data/templates'
+import { NEWS_FEEDS } from '../data/newsFeeds'
 
 // ─── Default appearance ─────────────────────────────────
 const DEFAULT_APPEARANCE = {
@@ -15,6 +16,18 @@ const DEFAULT_APPEARANCE = {
   theme: 'dark',
 }
 
+// ─── Default tab-level widgets ──────────────────────────
+const DEFAULT_TAB_WIDGETS = () => [
+  { id: 'w-clock',   type: 'clock' },
+  { id: 'w-weather', type: 'weather' },
+  {
+    id: 'w-news',
+    type: 'news',
+    config: { feedUrl: NEWS_FEEDS[0].url, feedName: NEWS_FEEDS[0].name },
+  },
+  { id: 'w-quote', type: 'quote' },
+]
+
 // ─── Build initial state from template ──────────────────
 export function buildStateFromTemplate(templateId) {
   const template = TEMPLATES.find(t => t.id === templateId)
@@ -24,6 +37,7 @@ export function buildStateFromTemplate(templateId) {
     id: tab.id,
     name: tab.name,
     icon: tab.icon,
+    widgets: DEFAULT_TAB_WIDGETS(),
     categories: tab.categories.map(cat => ({
       id: cat.id,
       name: cat.name,
@@ -48,6 +62,7 @@ function buildDefaultState() {
         id: 'home',
         name: 'Home',
         icon: '🏠',
+        widgets: DEFAULT_TAB_WIDGETS(),
         categories: [
           {
             id: 'cat-essentials',
@@ -246,8 +261,48 @@ export const useDashboardStore = create((set, get) => ({
     get().saveToFirestore()
   },
 
-  // ─── Widget mutations ──────────────────────────────────
-  addWidget(tabId, categoryId, widget) {
+  // ─── Tab-level widget mutations ────────────────────────
+  addWidget(tabId, widget) {
+    set(s => {
+      const tabs = s.state.tabs.map(tab => {
+        if (tab.id !== tabId) return tab
+        const existing = tab.widgets || []
+        return { ...tab, widgets: [...existing, widget] }
+      })
+      return { state: { ...s.state, tabs } }
+    })
+    get().saveToFirestore()
+  },
+
+  removeWidget(tabId, widgetId) {
+    set(s => {
+      const tabs = s.state.tabs.map(tab => {
+        if (tab.id !== tabId) return tab
+        return { ...tab, widgets: (tab.widgets || []).filter(w => w.id !== widgetId) }
+      })
+      return { state: { ...s.state, tabs } }
+    })
+    get().saveToFirestore()
+  },
+
+  updateWidget(tabId, widgetId, config) {
+    set(s => {
+      const tabs = s.state.tabs.map(tab => {
+        if (tab.id !== tabId) return tab
+        return {
+          ...tab,
+          widgets: (tab.widgets || []).map(w =>
+            w.id === widgetId ? { ...w, config: { ...(w.config || {}), ...config } } : w
+          ),
+        }
+      })
+      return { state: { ...s.state, tabs } }
+    })
+    get().saveToFirestore()
+  },
+
+  // ─── Category-level widget mutations ──────────────────
+  addCategoryWidget(tabId, categoryId, widget) {
     set(s => {
       const tabs = s.state.tabs.map(tab => {
         if (tab.id !== tabId) return tab
@@ -264,7 +319,7 @@ export const useDashboardStore = create((set, get) => ({
     get().saveToFirestore()
   },
 
-  removeWidget(tabId, categoryId, widgetId) {
+  removeCategoryWidget(tabId, categoryId, widgetId) {
     set(s => {
       const tabs = s.state.tabs.map(tab => {
         if (tab.id !== tabId) return tab
@@ -279,6 +334,51 @@ export const useDashboardStore = create((set, get) => ({
       return { state: { ...s.state, tabs } }
     })
     get().saveToFirestore()
+  },
+
+  // ─── Export / Import config ────────────────────────────
+  exportConfig() {
+    const { state } = get()
+    const json = JSON.stringify(state, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    const date = new Date().toLocaleDateString('en-AU').replace(/\//g, '-')
+    a.download = `gyst-config-${date}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 2000)
+  },
+
+  importConfig(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result)
+          if (!parsed.tabs) throw new Error('Invalid config file')
+          const { uid } = get()
+          set({ state: parsed })
+          if (uid) {
+            await setDoc(
+              doc(db, 'users', uid),
+              {
+                state: JSON.stringify(parsed),
+                updatedAt: serverTimestamp(),
+              },
+              { merge: true }
+            )
+          }
+          resolve()
+        } catch (err) {
+          reject(err)
+        }
+      }
+      reader.onerror = () => reject(new Error('File read error'))
+      reader.readAsText(file)
+    })
   },
 
   // ─── Firestore persistence ─────────────────────────────

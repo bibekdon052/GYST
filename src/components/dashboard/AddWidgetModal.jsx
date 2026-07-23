@@ -3,7 +3,7 @@ import { Modal } from '../ui/Modal'
 import { useDashboardStore } from '../../store/dashboardStore'
 
 export function AddWidgetModal({ isOpen, onClose, targetTabId, targetCategoryId }) {
-  const { addWidget } = useDashboardStore()
+  const { addCategoryWidget: addWidget } = useDashboardStore()
   const [type, setType] = useState('clock')
 
   const WIDGET_TYPES = [

@@ -18,6 +18,9 @@ import { TabBar } from '../components/dashboard/TabBar'
 import { CategorySection } from '../components/dashboard/CategorySection'
 import { PlatformSidebar } from '../components/sidebar/PlatformSidebar'
 import { CustomisePanel } from '../components/dashboard/CustomisePanel'
+import { GreetingBar } from '../components/dashboard/GreetingBar'
+import { WidgetRow } from '../components/dashboard/WidgetRow'
+import { WidgetGallery } from '../components/dashboard/WidgetGallery'
 import { Modal } from '../components/ui/Modal'
 import { getPlatformById } from '../data/platforms'
 
@@ -34,6 +37,8 @@ export default function DashboardPage() {
     reorderPlatforms,
     toggleSidebar,
     addPlatform,
+    addWidget,
+    removeWidget,
   } = useDashboardStore()
 
   const [customiseOpen, setCustomiseOpen] = useState(false)
@@ -42,6 +47,7 @@ export default function DashboardPage() {
   const [newCatIcon, setNewCatIcon] = useState('📁')
   const [activeDragId, setActiveDragId] = useState(null)
   const [activeCategoryId, setActiveCategoryId] = useState(null)
+  const [widgetGalleryOpen, setWidgetGalleryOpen] = useState(false)
 
   // Load data when user is available
   useEffect(() => {
@@ -118,6 +124,21 @@ export default function DashboardPage() {
     setAddCatOpen(false)
   }
 
+  // Toggle a widget type on/off for the current tab
+  function handleWidgetToggle(type, config) {
+    if (!currentTab) return
+    const existing = (currentTab.widgets || []).find(w => w.type === type)
+    if (existing) {
+      removeWidget(currentTab.id, existing.id)
+    } else {
+      addWidget(currentTab.id, {
+        id: `w-${type}-${Date.now()}`,
+        type,
+        ...(config ? { config } : {}),
+      })
+    }
+  }
+
   // Find dragged platform for overlay
   const draggedPlatform = activeDragId
     ? categories.flatMap(c => c.platforms).find(p => p.id === activeDragId)
@@ -144,71 +165,85 @@ export default function DashboardPage() {
         className="pt-[100px] transition-all duration-200"
         style={{ paddingRight: sidebarOpen ? '288px' : '0' }}
       >
-        <div className="max-w-screen-2xl mx-auto px-4 pb-16 pt-4">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="space-y-8">
-              {categories.map(category => (
-                <CategorySection
-                  key={category.id}
-                  category={category}
-                  tabId={currentTab?.id}
-                  onAddPlatform={() => toggleSidebar()}
-                />
-              ))}
+        <div className="max-w-screen-2xl mx-auto pb-16 pt-2">
+          {/* Greeting */}
+          <GreetingBar user={user} />
 
-              {/* Add category button */}
-              {currentTab && (
-                <button
-                  onClick={() => setAddCatOpen(true)}
-                  className="flex items-center gap-2 px-4 py-3 border border-dashed border-border rounded-xl text-muted hover:text-accent hover:border-accent/40 hover:bg-surface/40 transition-all text-sm"
-                >
-                  <span className="text-lg">+</span>
-                  Add a Category
-                </button>
-              )}
+          {/* Widget row */}
+          <WidgetRow
+            tabId={currentTab?.id}
+            widgets={currentTab?.widgets || []}
+            onManage={() => setWidgetGalleryOpen(true)}
+            onRemoveWidget={(wid) => removeWidget(currentTab.id, wid)}
+          />
 
-              {categories.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <div className="text-5xl mb-4">📂</div>
-                  <h3 className="text-lg font-semibold text-text mb-2">
-                    This tab is empty
-                  </h3>
-                  <p className="text-sm text-muted mb-6 max-w-xs">
-                    Add a category to start organising your platforms, or browse the library to add links.
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setAddCatOpen(true)}
-                      className="px-4 py-2 bg-accent text-white rounded-lg text-sm hover:opacity-90"
-                    >
-                      + Add Category
-                    </button>
-                    <button
-                      onClick={toggleSidebar}
-                      className="px-4 py-2 border border-border text-muted rounded-lg text-sm hover:text-text hover:border-accent/40"
-                    >
-                      Browse Library
-                    </button>
+          {/* Categories */}
+          <div className="px-4">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="space-y-8">
+                {categories.map(category => (
+                  <CategorySection
+                    key={category.id}
+                    category={category}
+                    tabId={currentTab?.id}
+                    onAddPlatform={() => toggleSidebar()}
+                  />
+                ))}
+
+                {/* Add category button */}
+                {currentTab && (
+                  <button
+                    onClick={() => setAddCatOpen(true)}
+                    className="flex items-center gap-2 px-4 py-3 border border-dashed border-border rounded-xl text-muted hover:text-accent hover:border-accent/40 hover:bg-surface/40 transition-all text-sm"
+                  >
+                    <span className="text-lg">+</span>
+                    Add a Category
+                  </button>
+                )}
+
+                {categories.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <div className="text-5xl mb-4">📂</div>
+                    <h3 className="text-lg font-semibold text-text mb-2">
+                      This tab is empty
+                    </h3>
+                    <p className="text-sm text-muted mb-6 max-w-xs">
+                      Add a category to start organising your platforms, or browse the library to add links.
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setAddCatOpen(true)}
+                        className="px-4 py-2 bg-accent text-white rounded-lg text-sm hover:opacity-90"
+                      >
+                        + Add Category
+                      </button>
+                      <button
+                        onClick={toggleSidebar}
+                        className="px-4 py-2 border border-border text-muted rounded-lg text-sm hover:text-text hover:border-accent/40"
+                      >
+                        Browse Library
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* Drag overlay */}
-            <DragOverlay>
-              {draggedPlatform && (
-                <div className="bg-surface border border-accent/50 rounded-xl p-3 shadow-2xl shadow-black/40 opacity-90 w-28">
-                  <div className="text-2xl">{draggedPlatform.emoji}</div>
-                  <div className="text-xs font-semibold text-text mt-1 truncate">{draggedPlatform.name}</div>
-                </div>
-              )}
-            </DragOverlay>
-          </DndContext>
+              {/* Drag overlay */}
+              <DragOverlay>
+                {draggedPlatform && (
+                  <div className="bg-surface border border-accent/50 rounded-xl p-3 shadow-2xl shadow-black/40 opacity-90 w-28">
+                    <div className="text-2xl">{draggedPlatform.emoji}</div>
+                    <div className="text-xs font-semibold text-text mt-1 truncate">{draggedPlatform.name}</div>
+                  </div>
+                )}
+              </DragOverlay>
+            </DndContext>
+          </div>
         </div>
       </main>
 
@@ -219,6 +254,14 @@ export default function DashboardPage() {
       <CustomisePanel
         isOpen={customiseOpen}
         onClose={() => setCustomiseOpen(false)}
+      />
+
+      {/* Widget gallery modal */}
+      <WidgetGallery
+        isOpen={widgetGalleryOpen}
+        onClose={() => setWidgetGalleryOpen(false)}
+        activeWidgets={currentTab?.widgets || []}
+        onToggle={handleWidgetToggle}
       />
 
       {/* Add category modal */}

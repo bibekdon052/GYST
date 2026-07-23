@@ -1,4 +1,4 @@
-# Cockpit — Setup Guide
+# GYST — Setup Guide
 
 A personal browser-based dashboard with widget bookmarks, drag-and-drop layout, and per-user config sync via Firebase.
 
@@ -7,7 +7,7 @@ A personal browser-based dashboard with widget bookmarks, drag-and-drop layout, 
 ## What you get
 
 - `index.html` — Login / sign-up page
-- `app.html` — The cockpit dashboard
+- `app.html` — The GYST dashboard
 - Each user who signs up gets their own private layout stored in Firebase
 - Anyone you share the URL with starts with a clean default — your customisations are never visible to others
 
@@ -16,7 +16,7 @@ A personal browser-based dashboard with widget bookmarks, drag-and-drop layout, 
 ## Step 1 — Create a Firebase project
 
 1. Go to [console.firebase.google.com](https://console.firebase.google.com)
-2. Click **Add project** → give it a name (e.g. `my-cockpit`) → Continue
+2. Click **Add project** → give it a name (e.g. `my-GYST`) → Continue
 3. Disable Google Analytics if you don't need it → **Create project**
 
 ---
@@ -58,15 +58,15 @@ This ensures each user can only read and write their own config.
 
 1. In your Firebase project, click the ⚙️ gear icon → **Project settings**
 2. Scroll to **Your apps** → click the **</>** (web) icon to add a web app
-3. Give it a nickname (e.g. `cockpit`) → **Register app**
+3. Give it a nickname (e.g. `GYST`) → **Register app**
 4. Copy the `firebaseConfig` object — it looks like this:
 
 ```js
 const firebaseConfig = {
   apiKey: "AIzaSy...",
-  authDomain: "my-cockpit.firebaseapp.com",
-  projectId: "my-cockpit",
-  storageBucket: "my-cockpit.appspot.com",
+  authDomain: "my-GYST.firebaseapp.com",
+  projectId: "my-GYST",
+  storageBucket: "my-GYST.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123456789:web:abcdef"
 };
@@ -83,9 +83,9 @@ In each file, find the `FIREBASE_CONFIG` block near the top of the `<script>` se
 ```js
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSy...",           // ← paste your values here
-  authDomain:        "my-cockpit.firebaseapp.com",
-  projectId:         "my-cockpit",
-  storageBucket:     "my-cockpit.appspot.com",
+  authDomain:        "my-GYST.firebaseapp.com",
+  projectId:         "my-GYST",
+  storageBucket:     "my-GYST.appspot.com",
   messagingSenderId: "123456789",
   appId:             "1:123456789:web:abcdef"
 };
@@ -95,13 +95,13 @@ const FIREBASE_CONFIG = {
 
 ## Step 6 — Deploy to GitHub Pages
 
-1. Create a new repository on [github.com](https://github.com) (e.g. `cockpit`)
+1. Create a new repository on [github.com](https://github.com) (e.g. `GYST`)
 2. Upload `index.html`, `app.html`, and `README.md` to the repo
 3. Go to **Settings → Pages**
 4. Under **Source**, select **Deploy from a branch** → `main` → `/ (root)` → **Save**
-5. GitHub will give you a URL like `https://yourusername.github.io/cockpit/`
+5. GitHub will give you a URL like `https://yourusername.github.io/GYST/`
 
-Your login page will be at `https://yourusername.github.io/cockpit/` and the dashboard at `.../app.html`.
+Your login page will be at `https://yourusername.github.io/GYST/` and the dashboard at `.../app.html`.
 
 ---
 

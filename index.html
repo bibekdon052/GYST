@@ -95,105 +95,109 @@ const firebaseConfig = {
 };
 // ──────────────────────────────────────────────────────────────────────────────
 
+let auth;
+
 if (firebaseConfig.apiKey.startsWith('YOUR_')) {
   document.getElementById('notConfigured').style.display = 'block';
   document.getElementById('mainForm').style.display = 'none';
 } else {
   firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+  auth = firebase.auth();
 
   // If already signed in, go straight to the app
   auth.onAuthStateChanged(user => {
     if (user) window.location.href = 'app.html';
   });
+}
 
-  let signUpMode = false;
+let signUpMode = false;
 
-  function toggleMode() {
-    signUpMode = !signUpMode;
-    document.getElementById('subtext').textContent = signUpMode ? 'Create your account' : 'Sign in to your workspace';
-    document.getElementById('authBtn').textContent = signUpMode ? 'Create Account' : 'Sign In';
-    document.getElementById('confirmFg').style.display = signUpMode ? '' : 'none';
-    document.getElementById('toggleText').textContent = signUpMode ? 'Already have an account?' : "Don't have an account?";
-    document.getElementById('toggleBtn').textContent = signUpMode ? ' Sign in' : ' Sign up';
-    document.getElementById('resetRow').style.display = signUpMode ? 'none' : '';
-    document.getElementById('password').autocomplete = signUpMode ? 'new-password' : 'current-password';
-    showErr(''); showOk('');
+function toggleMode() {
+  signUpMode = !signUpMode;
+  document.getElementById('subtext').textContent = signUpMode ? 'Create your account' : 'Sign in to your workspace';
+  document.getElementById('authBtn').textContent = signUpMode ? 'Create Account' : 'Sign In';
+  document.getElementById('confirmFg').style.display = signUpMode ? '' : 'none';
+  document.getElementById('toggleText').textContent = signUpMode ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('toggleBtn').textContent = signUpMode ? ' Sign in' : ' Sign up';
+  document.getElementById('resetRow').style.display = signUpMode ? 'none' : '';
+  document.getElementById('password').autocomplete = signUpMode ? 'new-password' : 'current-password';
+  showErr(''); showOk('');
+}
+
+function showErr(msg) {
+  const b = document.getElementById('errBox');
+  b.textContent = msg; b.style.display = msg ? 'block' : 'none';
+  document.getElementById('okBox').style.display = 'none';
+}
+function showOk(msg) {
+  const b = document.getElementById('okBox');
+  b.textContent = msg; b.style.display = msg ? 'block' : 'none';
+  document.getElementById('errBox').style.display = 'none';
+}
+
+async function doAuth() {
+  if (!auth) { showErr('Firebase is not configured.'); return; }
+  const email = document.getElementById('email').value.trim();
+  const pw = document.getElementById('password').value;
+  const btn = document.getElementById('authBtn');
+  if (!email || !pw) { showErr('Please enter your email and password.'); return; }
+  if (signUpMode) {
+    const conf = document.getElementById('confirm').value;
+    if (pw !== conf) { showErr('Passwords do not match.'); return; }
+    if (pw.length < 6) { showErr('Password must be at least 6 characters.'); return; }
   }
-
-  function showErr(msg) {
-    const b = document.getElementById('errBox');
-    b.textContent = msg; b.style.display = msg ? 'block' : 'none';
-    document.getElementById('okBox').style.display = 'none';
-  }
-  function showOk(msg) {
-    const b = document.getElementById('okBox');
-    b.textContent = msg; b.style.display = msg ? 'block' : 'none';
-    document.getElementById('errBox').style.display = 'none';
-  }
-
-  async function doAuth() {
-    const email = document.getElementById('email').value.trim();
-    const pw = document.getElementById('password').value;
-    const btn = document.getElementById('authBtn');
-    if (!email || !pw) { showErr('Please enter your email and password.'); return; }
+  btn.disabled = true;
+  btn.textContent = signUpMode ? 'Creating account…' : 'Signing in…';
+  showErr('');
+  try {
     if (signUpMode) {
-      const conf = document.getElementById('confirm').value;
-      if (pw !== conf) { showErr('Passwords do not match.'); return; }
-      if (pw.length < 6) { showErr('Password must be at least 6 characters.'); return; }
+      await auth.createUserWithEmailAndPassword(email, pw);
+    } else {
+      await auth.signInWithEmailAndPassword(email, pw);
     }
-    btn.disabled = true;
-    btn.textContent = signUpMode ? 'Creating account…' : 'Signing in…';
-    showErr('');
-    try {
-      if (signUpMode) {
-        await auth.createUserWithEmailAndPassword(email, pw);
-      } else {
-        await auth.signInWithEmailAndPassword(email, pw);
-      }
-      // onAuthStateChanged will redirect to app.html
-    } catch(e) {
-      const msgs = {
-        'auth/user-not-found': 'No account found with that email.',
-        'auth/wrong-password': 'Incorrect password.',
-        'auth/invalid-credential': 'Incorrect email or password.',
-        'auth/email-already-in-use': 'An account with that email already exists.',
-        'auth/invalid-email': 'Please enter a valid email address.',
-        'auth/weak-password': 'Password must be at least 6 characters.',
-        'auth/too-many-requests': 'Too many attempts. Please try again later.',
-        'auth/network-request-failed': 'Network error — check your internet connection.',
-      };
-      showErr(msgs[e.code] || e.message);
-      btn.disabled = false;
-      btn.textContent = signUpMode ? 'Create Account' : 'Sign In';
-    }
+    // onAuthStateChanged will redirect to app.html
+  } catch(e) {
+    const msgs = {
+      'auth/user-not-found': 'No account found with that email.',
+      'auth/wrong-password': 'Incorrect password.',
+      'auth/invalid-credential': 'Incorrect email or password.',
+      'auth/email-already-in-use': 'An account with that email already exists.',
+      'auth/invalid-email': 'Please enter a valid email address.',
+      'auth/weak-password': 'Password must be at least 6 characters.',
+      'auth/too-many-requests': 'Too many attempts. Please try again later.',
+      'auth/network-request-failed': 'Network error — check your internet connection.',
+    };
+    showErr(msgs[e.code] || e.message);
+    btn.disabled = false;
+    btn.textContent = signUpMode ? 'Create Account' : 'Sign In';
   }
+}
 
-  function showReset() {
-    document.getElementById('mainForm').style.display = 'none';
-    document.getElementById('resetForm').style.display = 'block';
-    document.getElementById('resetEmail').value = document.getElementById('email').value;
-    showErr(''); showOk('');
-  }
-  function showLogin() {
-    document.getElementById('resetForm').style.display = 'none';
-    document.getElementById('mainForm').style.display = 'block';
-    showErr(''); showOk('');
-  }
+function showReset() {
+  document.getElementById('mainForm').style.display = 'none';
+  document.getElementById('resetForm').style.display = 'block';
+  document.getElementById('resetEmail').value = document.getElementById('email').value;
+  showErr(''); showOk('');
+}
+function showLogin() {
+  document.getElementById('resetForm').style.display = 'none';
+  document.getElementById('mainForm').style.display = 'block';
+  showErr(''); showOk('');
+}
 
-  async function sendReset() {
-    const email = document.getElementById('resetEmail').value.trim();
-    const btn = document.getElementById('resetBtn');
-    if (!email) { showErr('Please enter your email address.'); return; }
-    btn.disabled = true; btn.textContent = 'Sending…';
-    try {
-      await auth.sendPasswordResetEmail(email);
-      showOk('Reset email sent! Check your inbox (and spam folder).');
-      btn.textContent = 'Sent ✓';
-    } catch(e) {
-      showErr(e.code === 'auth/user-not-found' ? 'No account found with that email.' : e.message);
-      btn.disabled = false; btn.textContent = 'Send Reset Email';
-    }
+async function sendReset() {
+  if (!auth) { showErr('Firebase is not configured.'); return; }
+  const email = document.getElementById('resetEmail').value.trim();
+  const btn = document.getElementById('resetBtn');
+  if (!email) { showErr('Please enter your email address.'); return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showOk('Reset email sent! Check your inbox (and spam folder).');
+    btn.textContent = 'Sent ✓';
+  } catch(e) {
+    showErr(e.code === 'auth/user-not-found' ? 'No account found with that email.' : e.message);
+    btn.disabled = false; btn.textContent = 'Send Reset Email';
   }
 }
 </script>

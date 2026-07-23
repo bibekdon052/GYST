@@ -160,6 +160,10 @@ body.editing .w-bookmark{pointer-events:none;}
 .api-footer{font-size:9px;color:var(--muted);text-align:right;flex-shrink:0;}
 .api-error{font-size:11px;color:var(--danger);padding:6px;text-align:center;}
 
+/* ─── HTML widget ─── */
+.w-html-frame{flex:1;width:100%;border:none;display:block;background:transparent;}
+body.editing .w-html-frame{pointer-events:none;}
+
 /* ─── Customise panel ─── */
 #cpanel{position:fixed;top:0;right:-390px;width:370px;height:100%;background:var(--surface);border-left:1px solid var(--border);z-index:300;overflow-y:auto;transition:right .25s ease;padding-bottom:40px;}
 #cpanel.open{right:0;}
@@ -329,6 +333,7 @@ body.editing .w-bookmark{pointer-events:none;}
       <div class="tt" data-t="clock" onclick="switchT('clock')">🕐 Clock</div>
       <div class="tt" data-t="calendar" onclick="switchT('calendar')">📅 Calendar</div>
       <div class="tt" data-t="api" onclick="switchT('api')">⚡ API</div>
+      <div class="tt" data-t="html" onclick="switchT('html')">🧩 HTML</div>
     </div>
     <!-- Bookmark -->
     <div class="t-pane active" id="tp-bookmark">
@@ -410,6 +415,15 @@ body.editing .w-bookmark{pointer-events:none;}
         </select>
       </div>
       <div class="fg"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="apiProxy" style="width:auto"/>Use CORS proxy</label></div>
+    </div>
+    <!-- HTML -->
+    <div class="t-pane" id="tp-html">
+      <div class="fg"><label>Widget Title</label><input id="htmlTitle" placeholder="e.g. Custom Clock"/></div>
+      <div class="fg">
+        <label>HTML Content</label>
+        <textarea id="htmlCode" style="font-family:monospace;font-size:11px;min-height:200px;resize:vertical" placeholder="<div style='color:white;padding:16px'>Hello World</div>"></textarea>
+        <p>Runs in a sandboxed iframe. JavaScript is supported. Cannot access the parent page or other widgets.</p>
+      </div>
     </div>
     <div class="m-actions">
       <button class="btn" onclick="closeModal()">Cancel</button>
@@ -698,6 +712,7 @@ if (firebaseConfig.apiKey.startsWith('YOUR_')) {
     card.className='w-card'+(w.type==='section'?' w-section-card':'');
     if(w.cardBg)card.style.background=w.cardBg;
     card.innerHTML=buildContent(w);
+    if(w.type==='html'){const f=card.querySelector('iframe');if(f)f.srcdoc=w.htmlCode||'<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6b7280;font-size:12px;font-family:system-ui;sans-serif">Click ✎ to add HTML</div>';}
     outer.appendChild(card);
     card.addEventListener('mousedown',e=>{
       if(!editMode)return;
@@ -724,6 +739,7 @@ if (firebaseConfig.apiKey.startsWith('YOUR_')) {
     if(w.type==='clock')return`${eb}<div class="w-clock"><div class="ck-day" id="ckd-${w.id}"></div><div class="ck-time" id="ckt-${w.id}">--:--</div><div class="ck-date" id="ckdt-${w.id}"></div></div>`;
     if(w.type==='calendar')return`${eb}<div class="w-cal" id="calwrap-${w.id}"><div class="cal-hdr"><div class="cal-title" id="caltit-${w.id}">📅 ${esc(w.calTitle||'Calendar')}</div><div class="cal-nav"><button onclick="calPrev('${w.id}')">‹</button><button onclick="calNext('${w.id}')">›</button></div></div><div class="cal-grid" id="calgrid-${w.id}"></div><div class="cal-events" id="calevs-${w.id}"></div></div>`;
     if(w.type==='api')return`${eb}<div class="w-api"><div class="api-hdr"><div class="api-title">⚡ ${esc(w.apiTitle||'API')}</div><button class="api-rbtn" onclick="fetchApi('${w.id}')">⟳</button></div><div class="api-body" id="apibody-${w.id}">${w.apiUrl?'<div style="font-size:11px;color:var(--muted);padding:8px">Loading…</div>':'<div class="setup-msg">⚡ Click ✎ to configure this API widget</div>'}</div><div class="api-footer" id="apifoot-${w.id}"></div></div>`;
+    if(w.type==='html')return`${eb}<div style="display:flex;flex-direction:column;height:100%;overflow:hidden"><div style="font-size:10px;color:var(--muted);padding:4px 10px;flex-shrink:0;border-bottom:1px solid var(--border)">🧩 ${esc(w.htmlTitle||'HTML Widget')}</div><iframe class="w-html-frame" id="htmlframe-${w.id}" sandbox="allow-scripts"></iframe></div>`;
     return '';
   }
 
@@ -1021,7 +1037,7 @@ if (firebaseConfig.apiKey.startsWith('YOUR_')) {
     document.querySelectorAll('.t-pane').forEach(el=>el.classList.toggle('active',el.id==='tp-'+t));
   }
   function clearModal(){
-    ['bName','bUrl','bDesc','bTag','sTitle','calTitle','calUrl','apiTitle','apiUrl','apiAuth','apiHeaders','apiPath','apiUnit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['bName','bUrl','bDesc','bTag','sTitle','calTitle','calUrl','apiTitle','apiUrl','apiAuth','apiHeaders','apiPath','apiUnit','htmlTitle','htmlCode'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     const ca=document.getElementById('calTitle');if(ca)ca.value='Calendar';
     const cp=document.getElementById('calProxy');if(cp)cp.checked=true;
     const ap2=document.getElementById('apiProxy');if(ap2)ap2.checked=false;
@@ -1042,6 +1058,7 @@ if (firebaseConfig.apiKey.startsWith('YOUR_')) {
     }else if(w.type==='section'){sv('sTitle',w.sTitle);}
     else if(w.type==='calendar'){sv('calTitle',w.calTitle);sv('calUrl',w.calUrl);const cp=document.getElementById('calProxy');if(cp)cp.checked=!!w.calProxy;}
     else if(w.type==='api'){sv('apiTitle',w.apiTitle);sv('apiUrl',w.apiUrl);sv('apiAuth',w.apiAuth);sv('apiHeaders',w.apiHeaders);sv('apiPath',w.apiPath);sv('apiUnit',w.apiUnit);const d=document.getElementById('apiDisp');if(d)d.value=w.apiDisp||'single';const r=document.getElementById('apiRef');if(r)r.value=w.apiRef||0;const p=document.getElementById('apiProxy');if(p)p.checked=!!w.apiProxy;}
+    else if(w.type==='html'){sv('htmlTitle',w.htmlTitle);const hc=document.getElementById('htmlCode');if(hc)hc.value=w.htmlCode||'';}
   }
   function sv(id,v){const el=document.getElementById(id);if(el)el.value=v||'';}
   function handleWidgetImg(e){
@@ -1074,7 +1091,7 @@ if (firebaseConfig.apiKey.startsWith('YOUR_')) {
     let w;
     if(editingId){w=currentWidgets().find(x=>x.id===editingId);if(!w)return;}
     else{
-      const def={bookmark:{w:2,h:2},section:{w:12,h:1},clock:{w:3,h:3},calendar:{w:5,h:5},api:{w:4,h:4}};
+      const def={bookmark:{w:2,h:2},section:{w:12,h:1},clock:{w:3,h:3},calendar:{w:5,h:5},api:{w:4,h:4},html:{w:4,h:4}};
       const d=def[curType]||{w:2,h:2};
       w={id:'w'+Date.now(),type:curType,x:0,y:0,...d};
       currentTab().widgets.push(w);
@@ -1091,6 +1108,10 @@ if (firebaseConfig.apiKey.startsWith('YOUR_')) {
       w.apiHeaders=document.getElementById('apiHeaders').value.trim();w.apiPath=document.getElementById('apiPath').value.trim();
       w.apiUnit=document.getElementById('apiUnit').value.trim();w.apiDisp=document.getElementById('apiDisp').value;
       w.apiRef=parseInt(document.getElementById('apiRef').value)||0;w.apiProxy=document.getElementById('apiProxy').checked;
+    }
+    else if(w.type==='html'){
+      w.htmlTitle=document.getElementById('htmlTitle').value.trim()||'HTML Widget';
+      w.htmlCode=document.getElementById('htmlCode').value;
     }
     save();
     stopApiInterval(w.id);

@@ -241,11 +241,49 @@ export const useDashboardStore = create((set, get) => ({
   },
 
   removeTab(tabId) {
+    set(s => {
+      const tab = s.state.tabs.find(t => t.id === tabId)
+      if (!tab) return s
+      const deletedTabs = [
+        { ...tab, deletedAt: Date.now() },
+        ...(s.state.deletedTabs || []),
+      ].slice(0, 20) // keep last 20 deleted tabs
+      return {
+        state: {
+          ...s.state,
+          tabs: s.state.tabs.filter(t => t.id !== tabId),
+          deletedTabs,
+        },
+        currentTabId: s.currentTabId === tabId
+          ? (s.state.tabs.find(t => t.id !== tabId)?.id || null)
+          : s.currentTabId,
+      }
+    })
+    get().saveToFirestore()
+  },
+
+  restoreTab(tabId) {
+    set(s => {
+      const tab = (s.state.deletedTabs || []).find(t => t.id === tabId)
+      if (!tab) return s
+      const { deletedAt, ...restored } = tab
+      return {
+        state: {
+          ...s.state,
+          tabs: [...s.state.tabs, restored],
+          deletedTabs: (s.state.deletedTabs || []).filter(t => t.id !== tabId),
+        },
+      }
+    })
+    get().saveToFirestore()
+  },
+
+  permanentlyDeleteTab(tabId) {
     set(s => ({
-      state: { ...s.state, tabs: s.state.tabs.filter(t => t.id !== tabId) },
-      currentTabId: s.currentTabId === tabId
-        ? (s.state.tabs.find(t => t.id !== tabId)?.id || null)
-        : s.currentTabId,
+      state: {
+        ...s.state,
+        deletedTabs: (s.state.deletedTabs || []).filter(t => t.id !== tabId),
+      },
     }))
     get().saveToFirestore()
   },

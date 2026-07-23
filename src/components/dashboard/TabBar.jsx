@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useDashboardStore } from '../../store/dashboardStore'
+import { RecycleBin } from './RecycleBin'
 
 export function TabBar() {
   const { state, currentTabId, setCurrentTab, addTab, removeTab, editMode } = useDashboardStore()
   const [adding, setAdding] = useState(false)
   const [newTabName, setNewTabName] = useState('')
   const [newTabIcon, setNewTabIcon] = useState('📁')
+  const [confirmDelete, setConfirmDelete] = useState(null) // tab to confirm deletion
 
   const tabs = state.tabs || []
 
@@ -42,7 +44,7 @@ export function TabBar() {
             </button>
             {editMode && tabs.length > 1 && (
               <button
-                onClick={() => removeTab(tab.id)}
+                onClick={() => setConfirmDelete(tab)}
                 className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger text-white text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
                 title="Remove tab"
               >
@@ -99,6 +101,56 @@ export function TabBar() {
           </button>
         </div>
       )}
+
+      {/* Recycle bin button — shown in edit mode when there are deleted tabs */}
+      {editMode && (state.deletedTabs?.length > 0) && (
+        <RecycleBinButton />
+      )}
+
+      {/* Confirmation dialog */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-surface border border-border rounded-2xl p-6 w-80 shadow-2xl">
+            <div className="text-3xl mb-3 text-center">🗑️</div>
+            <h3 className="text-base font-semibold text-text text-center mb-1">
+              Delete "{confirmDelete.name}"?
+            </h3>
+            <p className="text-xs text-muted text-center mb-5">
+              This tab and its {confirmDelete.categories?.reduce((n, c) => n + (c.platforms?.length || 0), 0) || 0} links will be moved to the recycle bin. You can restore it any time.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="flex-1 py-2 text-sm border border-border text-muted rounded-xl hover:text-text transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { removeTab(confirmDelete.id); setConfirmDelete(null) }}
+                className="flex-1 py-2 text-sm bg-danger text-white rounded-xl hover:opacity-90 transition-opacity"
+              >
+                Move to Bin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  )
+}
+
+function RecycleBinButton() {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-muted hover:text-danger hover:bg-danger/10 border border-dashed border-border transition-colors ml-auto"
+        title="Recycle bin"
+      >
+        🗑️
+      </button>
+      <RecycleBin isOpen={open} onClose={() => setOpen(false)} />
+    </>
   )
 }

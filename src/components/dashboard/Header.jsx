@@ -1,7 +1,22 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useDashboardStore } from '../../store/dashboardStore'
 import { useAuth } from '../../hooks/useAuth'
-import { ClockWidget } from '../widgets/ClockWidget'
+
+function HeaderClock() {
+  const [now, setNow] = useState(new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  const time = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: true })
+  const date = now.toLocaleDateString('en-AU', { weekday: 'short', day: '2-digit', month: 'short' })
+  return (
+    <div className="hidden lg:flex flex-col items-end leading-none gap-0.5">
+      <span className="text-sm font-mono font-semibold text-text tabular-nums">{time}</span>
+      <span className="text-xs text-muted">{date}</span>
+    </div>
+  )
+}
 
 function Toast({ message, type }) {
   if (!message) return null
@@ -76,9 +91,7 @@ export function Header({ onOpenCustomise }) {
         <div className="flex-1" />
 
         {/* Clock */}
-        <div className="hidden lg:block">
-          <ClockWidget />
-        </div>
+        <HeaderClock />
 
         {/* Save status */}
         <span className={`text-xs ${saveCls} hidden sm:block`}>{saveLabel}</span>

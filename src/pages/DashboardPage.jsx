@@ -19,6 +19,7 @@ import { CategorySection } from '../components/dashboard/CategorySection'
 import { PlatformSidebar } from '../components/sidebar/PlatformSidebar'
 import { CustomisePanel } from '../components/dashboard/CustomisePanel'
 import { GreetingBar } from '../components/dashboard/GreetingBar'
+import { SearchBar } from '../components/dashboard/SearchBar'
 import { WidgetRow } from '../components/dashboard/WidgetRow'
 import { WidgetGallery } from '../components/dashboard/WidgetGallery'
 import { Modal } from '../components/ui/Modal'
@@ -39,6 +40,7 @@ export default function DashboardPage() {
     addPlatform,
     addWidget,
     removeWidget,
+    updateWidget,
   } = useDashboardStore()
 
   const [customiseOpen, setCustomiseOpen] = useState(false)
@@ -124,6 +126,11 @@ export default function DashboardPage() {
     setAddCatOpen(false)
   }
 
+  function handleUpdateWidget(widgetId, config) {
+    if (!currentTab) return
+    updateWidget(currentTab.id, widgetId, config)
+  }
+
   // Toggle a widget type on/off for the current tab
   function handleWidgetToggle(type, config) {
     if (!currentTab) return
@@ -166,15 +173,15 @@ export default function DashboardPage() {
         style={{ paddingRight: sidebarOpen ? '288px' : '0' }}
       >
         <div className="max-w-screen-2xl mx-auto pb-16 pt-2">
-          {/* Greeting */}
           <GreetingBar user={user} />
+          <SearchBar />
 
-          {/* Widget row */}
           <WidgetRow
             tabId={currentTab?.id}
             widgets={currentTab?.widgets || []}
             onManage={() => setWidgetGalleryOpen(true)}
             onRemoveWidget={(wid) => removeWidget(currentTab.id, wid)}
+            onUpdateWidget={handleUpdateWidget}
           />
 
           {/* Categories */}

@@ -1,5 +1,27 @@
+import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+
+function FaviconIcon({ url, emoji }) {
+  const [failed, setFailed] = useState(false)
+
+  let hostname = ''
+  try { hostname = url ? new URL(url).hostname : '' } catch { /* invalid url */ }
+
+  if (!hostname || failed) {
+    return <span className="text-2xl leading-none pl-1">{emoji || '🔗'}</span>
+  }
+
+  return (
+    <img
+      src={`https://www.google.com/s2/favicons?sz=64&domain=${hostname}`}
+      alt=""
+      onError={() => setFailed(true)}
+      className="w-7 h-7 ml-1 rounded-md object-contain"
+      loading="lazy"
+    />
+  )
+}
 
 export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId }) {
   const {
@@ -63,8 +85,8 @@ export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId }
         </div>
       )}
 
-      {/* Emoji icon */}
-      <div className="text-2xl leading-none pl-1">{platform.emoji || '🔗'}</div>
+      {/* Favicon / emoji icon */}
+      <FaviconIcon url={platform.url} emoji={platform.emoji} />
 
       {/* Name */}
       <div className="text-xs font-semibold text-text leading-tight pl-1 truncate">{platform.name}</div>

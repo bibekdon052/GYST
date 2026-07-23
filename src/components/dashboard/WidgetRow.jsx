@@ -4,8 +4,9 @@ import { NewsWidget } from '../widgets/NewsWidget'
 import { QuoteWidget } from '../widgets/QuoteWidget'
 import { CalendarWidget } from '../widgets/CalendarWidget'
 import { HtmlWidget } from '../widgets/HtmlWidget'
+import { TasksWidget } from '../widgets/TasksWidget'
+import { NotesWidget } from '../widgets/NotesWidget'
 
-// Returns Tailwind classes for each widget type's card size
 function getWidgetClasses(type) {
   switch (type) {
     case 'clock':    return { card: 'h-32', col: '' }
@@ -14,16 +15,18 @@ function getWidgetClasses(type) {
     case 'news':     return { card: 'h-48', col: 'md:col-span-2' }
     case 'calendar': return { card: 'h-44', col: 'md:col-span-2' }
     case 'html':     return { card: 'h-40', col: '' }
+    case 'tasks':    return { card: 'h-56',  col: 'md:col-span-2' }
+    case 'notes':    return { card: 'h-44',  col: '' }
     default:         return { card: 'h-32', col: '' }
   }
 }
 
-function WidgetCard({ widget, onRemove }) {
+function WidgetCard({ widget, onRemove, onUpdate }) {
   const { card, col } = getWidgetClasses(widget.type)
+  const handleUpdate = (config) => onUpdate?.(widget.id, config)
 
   return (
     <div className={`relative group bg-surface border border-border rounded-2xl overflow-hidden ${card} ${col}`}>
-      {/* Remove button */}
       <button
         onClick={() => onRemove(widget.id)}
         className="absolute top-1.5 right-1.5 z-10 w-5 h-5 flex items-center justify-center text-muted/50 hover:text-danger hover:bg-surface2/80 rounded-full text-xs transition-all opacity-0 group-hover:opacity-100"
@@ -33,25 +36,23 @@ function WidgetCard({ widget, onRemove }) {
         ×
       </button>
 
-      {/* Widget content */}
       <div className="w-full h-full">
         {widget.type === 'clock'    && <ClockWidget />}
         {widget.type === 'weather'  && <WeatherWidget widget={widget} />}
         {widget.type === 'news'     && <NewsWidget widget={widget} />}
         {widget.type === 'quote'    && <QuoteWidget widget={widget} />}
         {widget.type === 'calendar' && <CalendarWidget />}
+        {widget.type === 'tasks'    && <TasksWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'notes'    && <NotesWidget widget={widget} onUpdate={handleUpdate} />}
         {widget.type === 'html'     && (
-          <HtmlWidget
-            content={widget.config?.html || ''}
-            title="HTML Widget"
-          />
+          <HtmlWidget content={widget.config?.html || ''} title="HTML Widget" />
         )}
       </div>
     </div>
   )
 }
 
-export function WidgetRow({ tabId, widgets = [], onManage, onRemoveWidget }) {
+export function WidgetRow({ tabId, widgets = [], onManage, onRemoveWidget, onUpdateWidget }) {
   if (widgets.length === 0) {
     return (
       <div className="px-6 pb-4">
@@ -74,6 +75,7 @@ export function WidgetRow({ tabId, widgets = [], onManage, onRemoveWidget }) {
             key={widget.id}
             widget={widget}
             onRemove={onRemoveWidget}
+            onUpdate={onUpdateWidget}
           />
         ))}
 

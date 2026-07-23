@@ -3,7 +3,9 @@ import { Modal } from '../ui/Modal'
 import { NEWS_FEEDS } from '../../data/newsFeeds'
 
 const WIDGET_TYPES = [
-  { type: 'clock',    name: 'Clock',         emoji: '🕐', description: 'Live time and date display' },
+  { type: 'tasks',    name: 'Tasks',          emoji: '✅', description: 'A checklist for today — tick things off as you go' },
+  { type: 'notes',    name: 'Quick Note',     emoji: '📝', description: 'Sticky note that auto-saves to your dashboard' },
+  { type: 'clock',    name: 'Clock',          emoji: '🕐', description: 'Live time and date display' },
   { type: 'weather',  name: 'Weather',        emoji: '🌤️', description: 'Current conditions via Open-Meteo (no API key needed)' },
   { type: 'news',     name: 'News Headlines', emoji: '📰', description: 'Top headlines from Australian news sources' },
   { type: 'quote',    name: 'Daily Quote',    emoji: '💭', description: 'A new motivational quote every day' },

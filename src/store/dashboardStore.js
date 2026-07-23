@@ -374,6 +374,71 @@ export const useDashboardStore = create((set, get) => ({
     get().saveToFirestore()
   },
 
+  // ─── Template-based additions ─────────────────────────
+  addTabFromTemplate(template) {
+    const newTab = {
+      id: `tab-${Date.now()}`,
+      name: template.name,
+      icon: template.icon,
+      widgets: DEFAULT_TAB_WIDGETS(),
+      categories: template.categories.map((cat, i) => ({
+        id: `cat-${Date.now()}-${i}`,
+        name: cat.name,
+        icon: cat.icon,
+        platforms: cat.platformIds.map(pid => getPlatformById(pid)).filter(Boolean),
+        widgets: [],
+      })),
+    }
+    set(s => ({ state: { ...s.state, tabs: [...s.state.tabs, newTab] } }))
+    get().saveToFirestore()
+  },
+
+  addCategoryFromTemplate(tabId, categoryTemplate) {
+    const newCat = {
+      id: `cat-${Date.now()}`,
+      name: categoryTemplate.name,
+      icon: categoryTemplate.icon,
+      platforms: categoryTemplate.platformIds.map(pid => getPlatformById(pid)).filter(Boolean),
+      widgets: [],
+    }
+    set(s => {
+      const tabs = s.state.tabs.map(tab => {
+        if (tab.id !== tabId) return tab
+        // Skip if category name already exists
+        if (tab.categories.some(c => c.name.toLowerCase() === categoryTemplate.name.toLowerCase())) return tab
+        return { ...tab, categories: [...tab.categories, newCat] }
+      })
+      return { state: { ...s.state, tabs } }
+    })
+    get().saveToFirestore()
+  },
+
+  // ─── Reset to default ──────────────────────────────────
+  async resetConfig() {
+    const { uid } = get()
+    const defaultState = buildDefaultState()
+    set({
+      state: defaultState,
+      onboardingComplete: false,
+      currentTabId: defaultState.tabs[0]?.id || null,
+    })
+    if (uid) {
+      try {
+        await setDoc(
+          doc(db, 'users', uid),
+          {
+            state: JSON.stringify(defaultState),
+            onboardingComplete: false,
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true }
+        )
+      } catch (err) {
+        console.error('Failed to reset config:', err)
+      }
+    }
+  },
+
   // ─── Export / Import config ────────────────────────────
   exportConfig() {
     const { state } = get()

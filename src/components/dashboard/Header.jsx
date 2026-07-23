@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDashboardStore } from '../../store/dashboardStore'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -34,10 +35,12 @@ function Toast({ message, type }) {
 }
 
 export function Header({ onOpenCustomise }) {
-  const { state, editMode, sidebarOpen, saveStatus, toggleEditMode, toggleSidebar, exportConfig, importConfig } = useDashboardStore()
+  const { state, editMode, sidebarOpen, saveStatus, toggleEditMode, toggleSidebar, exportConfig, importConfig, resetConfig } = useDashboardStore()
   const { user, signOut } = useAuth()
+  const navigate = useNavigate()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [toast, setToast] = useState(null)
+  const [resetConfirm, setResetConfirm] = useState(false)
   const toastTimerRef = useRef(null)
   const importInputRef = useRef(null)
 
@@ -61,6 +64,12 @@ export function Header({ onOpenCustomise }) {
   function handleImportClick() {
     setUserMenuOpen(false)
     importInputRef.current?.click()
+  }
+
+  async function handleReset() {
+    setResetConfirm(false)
+    await resetConfig()
+    navigate('/onboarding')
   }
 
   async function handleImportFile(e) {
@@ -171,6 +180,14 @@ export function Header({ onOpenCustomise }) {
                     </button>
                     <div className="my-1 border-t border-border" />
                     <button
+                      onClick={() => { setResetConfirm(true); setUserMenuOpen(false) }}
+                      className="w-full text-left px-3 py-2 text-sm text-text hover:bg-surface2 rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <span>🔁</span>
+                      Reset to Default
+                    </button>
+                    <div className="my-1 border-t border-border" />
+                    <button
                       onClick={() => { signOut(); setUserMenuOpen(false) }}
                       className="w-full text-left px-3 py-2 text-sm text-danger hover:bg-danger/10 rounded-lg transition-colors"
                     >
@@ -183,6 +200,35 @@ export function Header({ onOpenCustomise }) {
           </div>
         </div>
       </header>
+
+      {/* Reset confirmation dialog */}
+      {resetConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-surface border border-border rounded-2xl p-6 w-80 shadow-2xl">
+            <div className="text-3xl mb-3 text-center">🔁</div>
+            <h3 className="text-base font-semibold text-text text-center mb-2">
+              Reset to Default?
+            </h3>
+            <p className="text-xs text-muted text-center mb-5 leading-relaxed">
+              This will clear your entire dashboard and take you back through the setup wizard. Your current layout cannot be recovered — export it first if you'd like to keep it.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setResetConfirm(false)}
+                className="flex-1 py-2 text-sm border border-border text-muted rounded-xl hover:text-text transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReset}
+                className="flex-1 py-2 text-sm bg-danger text-white rounded-xl hover:opacity-90 transition-opacity"
+              >
+                Reset & Restart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hidden file input for import */}
       <input

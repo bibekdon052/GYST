@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useDashboardStore } from '../../store/dashboardStore'
 import { RecycleBin } from './RecycleBin'
+import { TabTemplateGallery } from './TabTemplateGallery'
 
 export function TabBar() {
   const { state, currentTabId, setCurrentTab, addTab, removeTab, editMode } = useDashboardStore()
@@ -8,6 +9,8 @@ export function TabBar() {
   const [newTabName, setNewTabName] = useState('')
   const [newTabIcon, setNewTabIcon] = useState('📁')
   const [confirmDelete, setConfirmDelete] = useState(null) // tab to confirm deletion
+
+  const [galleryOpen, setGalleryOpen] = useState(false)
 
   const tabs = state.tabs || []
 
@@ -57,12 +60,21 @@ export function TabBar() {
 
       {/* Add tab */}
       {editMode && !adding && (
-        <button
-          onClick={() => setAdding(true)}
-          className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-muted hover:text-accent hover:bg-surface2 border border-dashed border-border transition-colors"
-        >
-          + Tab
-        </button>
+        <>
+          <button
+            onClick={() => setAdding(true)}
+            className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-muted hover:text-accent hover:bg-surface2 border border-dashed border-border transition-colors"
+          >
+            + Tab
+          </button>
+          <button
+            onClick={() => setGalleryOpen(true)}
+            className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-muted hover:text-accent hover:bg-surface2 border border-dashed border-border transition-colors"
+            title="Browse tab & category templates"
+          >
+            📋 Templates
+          </button>
+        </>
       )}
 
       {adding && (
@@ -106,6 +118,9 @@ export function TabBar() {
       {editMode && (state.deletedTabs?.length > 0) && (
         <RecycleBinButton />
       )}
+
+      {/* Template gallery modal */}
+      <TabTemplateGallery isOpen={galleryOpen} onClose={() => setGalleryOpen(false)} />
 
       {/* Confirmation dialog */}
       {confirmDelete && (

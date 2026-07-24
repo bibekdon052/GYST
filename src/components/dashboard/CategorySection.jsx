@@ -6,7 +6,7 @@ import {
 import { useDashboardStore } from '../../store/dashboardStore'
 import { PlatformCard } from './PlatformCard'
 
-export function CategorySection({ category, tabId, allCategories = [], onAddPlatform, compact = false }) {
+export function CategorySection({ category, tabId, allCategories = [], onAddPlatform, compact = false, onPreview }) {
   const { editMode, removePlatform, renameCategory, removeCategory, movePlatform } = useDashboardStore()
   const otherCategories = allCategories.filter(c => c.id !== category.id)
   const [renaming, setRenaming] = useState(false)
@@ -87,6 +87,7 @@ export function CategorySection({ category, tabId, allCategories = [], onAddPlat
               otherCategories={otherCategories}
               onRemove={() => removePlatform(tabId, category.id, platform.id)}
               onMove={(toCatId) => movePlatform(tabId, category.id, toCatId, platform.id)}
+              onPreview={onPreview}
             />
           ))}
 

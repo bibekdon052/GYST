@@ -8,6 +8,7 @@ export function PlatformSidebar() {
   const [filterCat, setFilterCat] = useState('all')
   const [addTarget, setAddTarget] = useState(null)
   const [targetCatId, setTargetCatId] = useState('')
+  const [customUrl, setCustomUrl] = useState('')
 
   const results = useMemo(() => {
     let list = query ? searchPlatforms(query) : PLATFORM_CATEGORIES.flatMap(c => c.platforms)
@@ -49,6 +50,29 @@ export function PlatformSidebar() {
     if (!addTarget || !targetCatId) return
     addPlatform(currentTab.id, targetCatId, addTarget)
     setAddTarget(null)
+  }
+
+  function handleCustomUrl() {
+    let url = customUrl.trim()
+    if (!url) return
+    if (!/^https?:\/\//i.test(url)) url = `https://${url}`
+    let name = url
+    try {
+      const hostname = new URL(url).hostname.replace(/^www\./, '')
+      const firstPart = hostname.split('.')[0]
+      name = firstPart.charAt(0).toUpperCase() + firstPart.slice(1)
+    } catch {}
+    handleAdd({
+      id: `custom-${Date.now()}`,
+      name,
+      url,
+      emoji: '🔗',
+      color: '#6b7280',
+      description: 'Custom link',
+      tags: ['custom'],
+      category: 'custom',
+    })
+    setCustomUrl('')
   }
 
   if (!sidebarOpen) return null
@@ -106,6 +130,29 @@ export function PlatformSidebar() {
                 {c.icon}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Custom URL quick-add */}
+        <div className="px-3 pt-3 pb-2 border-b border-border shrink-0">
+          <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-1.5">Quick Add URL</p>
+          <div className="flex gap-1.5">
+            <input
+              type="url"
+              value={customUrl}
+              onChange={e => setCustomUrl(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleCustomUrl() }}
+              placeholder="Paste any URL…"
+              className="flex-1 min-w-0 bg-surface2 border border-border rounded-lg px-2.5 py-1.5 text-xs text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60"
+            />
+            <button
+              onClick={handleCustomUrl}
+              disabled={!customUrl.trim()}
+              className="shrink-0 px-2.5 py-1.5 text-xs bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity"
+              title="Add URL"
+            >
+              +
+            </button>
           </div>
         </div>
 

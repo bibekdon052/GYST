@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useDashboardStore } from '../../store/dashboardStore'
+import { applyThemeVars, hexToRgbVars } from '../../utils/themeVars'
 
 const ACCENT_PRESETS = [
   '#4f8ef7', '#7c3aed', '#ec4899', '#22c55e', '#f59e0b', '#ef4444',
@@ -106,17 +107,15 @@ export function CustomisePanel({ isOpen, onClose }) {
 
   function setAccent(color) {
     updateAppearance({ accentColor: color })
-    const hex = color.replace('#', '')
-    const r = parseInt(hex.substring(0, 2), 16)
-    const g = parseInt(hex.substring(2, 4), 16)
-    const b = parseInt(hex.substring(4, 6), 16)
-    if (!isNaN(r)) document.documentElement.style.setProperty('--color-accent', `${r} ${g} ${b}`)
+    const rgb = hexToRgbVars(color)
+    if (rgb) document.documentElement.style.setProperty('--color-accent', rgb)
   }
 
   function applyTheme(theme) {
-    document.documentElement.dataset.theme = theme.id
+    applyThemeVars(theme.id)
     updateAppearance({ theme: theme.id, accentColor: theme.accent })
-    setAccent(theme.accent)
+    const rgb = hexToRgbVars(theme.accent)
+    if (rgb) document.documentElement.style.setProperty('--color-accent', rgb)
   }
 
   return (

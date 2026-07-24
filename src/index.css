@@ -2,79 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Theme tokens ───────────────────────────────────── */
-:root {
-  /* Dark (default) */
-  --color-bg:       15 17 23;
-  --color-surface:  26 29 39;
-  --color-surface2: 34 38 58;
-  --color-border:   46 50 71;
-  --color-text:     226 229 240;
-  --color-muted:    107 114 128;
-  --color-accent:   79 142 247;
-  --font-body:      system-ui, sans-serif;
-}
-
-[data-theme="light"] {
-  --color-bg:       247 248 252;
-  --color-surface:  255 255 255;
-  --color-surface2: 241 243 249;
-  --color-border:   210 214 230;
-  --color-text:     15 17 23;
-  --color-muted:    107 114 128;
-}
-
-[data-theme="paper"] {
-  --color-bg:       253 248 235;
-  --color-surface:  255 253 245;
-  --color-surface2: 247 239 218;
-  --color-border:   214 195 156;
-  --color-text:     45 30 12;
-  --color-muted:    140 118 85;
-}
-
-[data-theme="bush"] {
-  --color-bg:       28 22 10;
-  --color-surface:  40 32 16;
-  --color-surface2: 56 44 22;
-  --color-border:   82 66 34;
-  --color-text:     240 224 188;
-  --color-muted:    160 140 100;
-}
-
-[data-theme="ocean"] {
-  --color-bg:       6 18 34;
-  --color-surface:  10 28 52;
-  --color-surface2: 14 40 70;
-  --color-border:   24 60 100;
-  --color-text:     200 225 248;
-  --color-muted:    100 150 200;
-}
-
-[data-theme="rose"] {
-  --color-bg:       17 10 16;
-  --color-surface:  28 16 32;
-  --color-surface2: 42 22 48;
-  --color-border:   70 34 80;
-  --color-text:     248 224 240;
-  --color-muted:    180 120 160;
-}
-
-[data-theme="slate"] {
-  --color-bg:       12 12 15;
-  --color-surface:  24 24 27;
-  --color-surface2: 36 36 42;
-  --color-border:   63 63 70;
-  --color-text:     244 244 245;
-  --color-muted:    113 113 122;
-}
-
 /* ─── Base ───────────────────────────────────────────── */
+/* CSS color variables are set via JS (themeVars.js) so  */
+/* Tailwind preserves var() references in compiled output */
 * { box-sizing: border-box; }
 
 body {
-  background: rgb(var(--color-bg));
-  color: rgb(var(--color-text));
+  background: rgb(var(--color-bg, 15 17 23));
+  color: rgb(var(--color-text, 226 229 240));
   font-family: var(--font-body), system-ui, sans-serif;
   transition: background 0.2s, color 0.2s;
 }
@@ -82,22 +17,25 @@ body {
 /* ─── Scrollbar ──────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgb(var(--color-border)); border-radius: 2px; }
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-border, 46 50 71));
+  border-radius: 2px;
+}
 
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: rgb(var(--color-border)) transparent;
+    scrollbar-color: rgb(var(--color-border, 46 50 71)) transparent;
   }
 }
 
-/* ─── Handwriting font class ─────────────────────────── */
+/* ─── Handwriting font ───────────────────────────────── */
 .font-handwriting {
   font-family: 'Caveat', cursive;
   letter-spacing: 0.01em;
 }
 
-/* ─── Magnet board ───────────────────────────────────── */
+/* ─── Magnet note shadow ─────────────────────────────── */
 .magnet-note {
   box-shadow: 2px 4px 12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.15);
 }

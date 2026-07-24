@@ -12,6 +12,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { useAuth } from '../hooks/useAuth'
+import { applyThemeVars, hexToRgbVars } from '../utils/themeVars'
 import { useDashboardStore } from '../store/dashboardStore'
 import { Header } from '../components/dashboard/Header'
 import { TabBar } from '../components/dashboard/TabBar'
@@ -71,27 +72,23 @@ export default function DashboardPage() {
 
   const appearance = state.appearance || {}
 
-  // Apply theme, accent, font to document
+  // Apply theme, accent, font to document whenever appearance changes
   useEffect(() => {
-    const theme = appearance.theme || 'dark'
-    document.documentElement.dataset.theme = theme
+    applyThemeVars(appearance.theme || 'dark')
   }, [appearance.theme])
 
   useEffect(() => {
     if (appearance.accentColor) {
-      const hex = appearance.accentColor.replace('#', '')
-      const r = parseInt(hex.substring(0, 2), 16)
-      const g = parseInt(hex.substring(2, 4), 16)
-      const b = parseInt(hex.substring(4, 6), 16)
-      if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
-        document.documentElement.style.setProperty('--color-accent', `${r} ${g} ${b}`)
-      }
+      const rgb = hexToRgbVars(appearance.accentColor)
+      if (rgb) document.documentElement.style.setProperty('--color-accent', rgb)
     }
   }, [appearance.accentColor])
 
   useEffect(() => {
-    const font = appearance.fontFamily || 'system-ui, sans-serif'
-    document.documentElement.style.setProperty('--font-body', font)
+    document.documentElement.style.setProperty(
+      '--font-body',
+      appearance.fontFamily || 'system-ui, sans-serif'
+    )
   }, [appearance.fontFamily])
 
   useEffect(() => {

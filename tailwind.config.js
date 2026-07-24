@@ -1,16 +1,27 @@
 /** @type {import('tailwindcss').Config} */
+
+// Returns a Tailwind color function that preserves the CSS variable reference at runtime
+function cssVar(variable) {
+  return ({ opacityValue }) => {
+    if (opacityValue !== undefined) {
+      return `rgb(var(${variable}) / ${opacityValue})`
+    }
+    return `rgb(var(${variable}))`
+  }
+}
+
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        bg:       'rgb(var(--color-bg) / <alpha-value>)',
-        surface:  'rgb(var(--color-surface) / <alpha-value>)',
-        surface2: 'rgb(var(--color-surface2) / <alpha-value>)',
-        border:   'rgb(var(--color-border) / <alpha-value>)',
-        text:     'rgb(var(--color-text) / <alpha-value>)',
-        muted:    'rgb(var(--color-muted) / <alpha-value>)',
-        accent:   'rgb(var(--color-accent) / <alpha-value>)',
+        bg:       cssVar('--color-bg'),
+        surface:  cssVar('--color-surface'),
+        surface2: cssVar('--color-surface2'),
+        border:   cssVar('--color-border'),
+        text:     cssVar('--color-text'),
+        muted:    cssVar('--color-muted'),
+        accent:   cssVar('--color-accent'),
         danger:   '#f87171',
         success:  '#22c55e',
       },

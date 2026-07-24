@@ -1,43 +1,49 @@
-import { ClockWidget } from '../widgets/ClockWidget'
-import { WeatherWidget } from '../widgets/WeatherWidget'
-import { NewsWidget } from '../widgets/NewsWidget'
-import { QuoteWidget } from '../widgets/QuoteWidget'
-import { CalendarWidget } from '../widgets/CalendarWidget'
-import { HtmlWidget } from '../widgets/HtmlWidget'
-import { TasksWidget } from '../widgets/TasksWidget'
-import { NotesWidget } from '../widgets/NotesWidget'
-import { CountdownWidget } from '../widgets/CountdownWidget'
+import { ClockWidget }       from '../widgets/ClockWidget'
+import { WeatherWidget }     from '../widgets/WeatherWidget'
+import { NewsWidget }        from '../widgets/NewsWidget'
+import { QuoteWidget }       from '../widgets/QuoteWidget'
+import { CalendarWidget }    from '../widgets/CalendarWidget'
+import { HtmlWidget }        from '../widgets/HtmlWidget'
+import { TasksWidget }       from '../widgets/TasksWidget'
+import { NotesWidget }       from '../widgets/NotesWidget'
+import { CountdownWidget }   from '../widgets/CountdownWidget'
 import { MagnetBoardWidget } from '../widgets/MagnetBoardWidget'
-import { TodayWidget } from '../widgets/TodayWidget'
+import { TodayWidget }       from '../widgets/TodayWidget'
+import { LinkWidget }        from '../widgets/LinkWidget'
+import { WebhookWidget }     from '../widgets/WebhookWidget'
 
-function getWidgetClasses(type) {
+// All small (1-col) widgets: h-36 = 144 px
+// All wide (2-col) widgets:  h-44 = 176 px   (taller ones: h-56/h-64)
+function getWidgetMeta(type) {
   switch (type) {
-    case 'clock':    return { card: 'h-32',  col: '' }
-    case 'quote':    return { card: 'h-32',  col: '' }
-    case 'weather':  return { card: 'h-36',  col: '' }
-    case 'news':     return { card: 'h-48',  col: 'md:col-span-2' }
-    case 'calendar': return { card: 'h-44',  col: 'md:col-span-2' }
-    case 'html':     return { card: 'h-40',  col: '' }
-    case 'tasks':    return { card: 'h-56',  col: 'md:col-span-2' }
-    case 'notes':    return { card: 'h-44',  col: '' }
-    case 'countdown':return { card: 'h-56',  col: '' }
-    case 'magnets':  return { card: 'h-64',  col: 'md:col-span-2' }
-    case 'today':    return { card: 'h-72',  col: 'md:col-span-2' }
-    default:         return { card: 'h-32',  col: '' }
+    case 'clock':     return { h: 'h-36', wide: false }
+    case 'weather':   return { h: 'h-36', wide: false }
+    case 'quote':     return { h: 'h-36', wide: false }
+    case 'notes':     return { h: 'h-36', wide: false }
+    case 'link':      return { h: 'h-36', wide: false }
+    case 'countdown': return { h: 'h-36', wide: false }
+    case 'html':      return { h: 'h-44', wide: false }
+    case 'webhook':   return { h: 'h-44', wide: false }
+    case 'news':      return { h: 'h-44', wide: true  }
+    case 'calendar':  return { h: 'h-44', wide: true  }
+    case 'tasks':     return { h: 'h-56', wide: true  }
+    case 'magnets':   return { h: 'h-56', wide: true  }
+    case 'today':     return { h: 'h-64', wide: true  }
+    default:          return { h: 'h-36', wide: false }
   }
 }
 
 function WidgetCard({ widget, onRemove, onUpdate }) {
-  const { card, col } = getWidgetClasses(widget.type)
+  const { h, wide } = getWidgetMeta(widget.type)
   const handleUpdate = (config) => onUpdate?.(widget.id, config)
+  const colSpan = wide ? 'md:col-span-2' : ''
 
   return (
-    <div className={`relative group bg-surface border border-border rounded-2xl overflow-hidden ${card} ${col}`}>
+    <div className={`relative group bg-surface border border-border rounded-2xl overflow-hidden ${h} ${colSpan}`}>
       <button
         onClick={() => onRemove(widget.id)}
-        className="absolute top-1.5 right-1.5 z-10 w-5 h-5 flex items-center justify-center text-muted/50 hover:text-danger hover:bg-surface2/80 rounded-full text-xs transition-all opacity-0 group-hover:opacity-100"
+        className="absolute top-1.5 right-1.5 z-10 w-5 h-5 flex items-center justify-center text-muted/40 hover:text-danger hover:bg-surface2/80 rounded-full text-xs transition-all opacity-0 group-hover:opacity-100"
         title="Remove widget"
-        aria-label="Remove widget"
       >
         ×
       </button>
@@ -53,6 +59,8 @@ function WidgetCard({ widget, onRemove, onUpdate }) {
         {widget.type === 'countdown'&& <CountdownWidget widget={widget} onUpdate={handleUpdate} />}
         {widget.type === 'magnets'  && <MagnetBoardWidget widget={widget} onUpdate={handleUpdate} />}
         {widget.type === 'today'    && <TodayWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'link'     && <LinkWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'webhook'  && <WebhookWidget widget={widget} onUpdate={handleUpdate} />}
         {widget.type === 'html'     && (
           <HtmlWidget content={widget.config?.html || ''} title="HTML Widget" />
         )}
@@ -78,7 +86,7 @@ export function WidgetRow({ tabId, widgets = [], onManage, onRemoveWidget, onUpd
 
   return (
     <div className="px-6 pb-4">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 auto-rows-auto">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {widgets.map(widget => (
           <WidgetCard
             key={widget.id}
@@ -88,13 +96,14 @@ export function WidgetRow({ tabId, widgets = [], onManage, onRemoveWidget, onUpd
           />
         ))}
 
-        <div className="flex items-center justify-center h-32">
+        {/* Always-visible add button */}
+        <div className="h-36 flex items-center justify-center">
           <button
             onClick={onManage}
-            className="flex flex-col items-center gap-1.5 px-4 py-3 text-xs border border-dashed border-border text-muted hover:text-accent hover:border-accent/40 hover:bg-surface/30 rounded-2xl transition-all w-full h-full justify-center"
+            className="flex flex-col items-center gap-1.5 text-xs border border-dashed border-border text-muted hover:text-accent hover:border-accent/40 hover:bg-surface/30 rounded-2xl transition-all w-full h-full justify-center"
           >
             <span className="text-xl">＋</span>
-            <span>Widgets</span>
+            <span>Add Widget</span>
           </button>
         </div>
       </div>

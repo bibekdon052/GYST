@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 export function Modal({ isOpen, onClose, title, children, width = 'max-w-md' }) {
   useEffect(() => {
@@ -12,9 +13,9 @@ export function Modal({ isOpen, onClose, title, children, width = 'max-w-md' }) 
 
   if (!isOpen) return null
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[999] flex items-center justify-center p-4"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       {/* Backdrop */}
@@ -46,6 +47,7 @@ export function Modal({ isOpen, onClose, title, children, width = 'max-w-md' }) 
         {/* Body */}
         <div className="p-6">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

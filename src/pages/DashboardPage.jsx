@@ -25,6 +25,7 @@ import { WidgetRow } from '../components/dashboard/WidgetRow'
 import { WidgetGallery } from '../components/dashboard/WidgetGallery'
 import { Modal } from '../components/ui/Modal'
 import { getPlatformById } from '../data/platforms'
+import { InfoBar } from '../components/dashboard/InfoBar'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -95,6 +96,10 @@ export default function DashboardPage() {
     const customBg = appearance.background?.value
     document.body.style.background = customBg || ''
   }, [appearance.background])
+
+  const customBgStyle = appearance.background?.value
+    ? { background: appearance.background.value }
+    : undefined
 
   function handleDragStart(event) {
     setActiveDragId(event.active.id)
@@ -174,7 +179,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-bg" style={customBgStyle}>
       {/* Fixed header */}
       <Header onOpenCustomise={() => setCustomiseOpen(true)} />
 
@@ -188,6 +193,7 @@ export default function DashboardPage() {
       >
         <div className="max-w-screen-2xl mx-auto pb-16 pt-2">
           <GreetingBar user={user} />
+          <InfoBar />
           <SearchBar />
 
           <WidgetRow

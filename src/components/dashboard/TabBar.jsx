@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useDashboardStore } from '../../store/dashboardStore'
 import { RecycleBin } from './RecycleBin'
 import { TabTemplateGallery } from './TabTemplateGallery'
@@ -122,9 +123,9 @@ export function TabBar() {
       {/* Template gallery modal */}
       <TabTemplateGallery isOpen={galleryOpen} onClose={() => setGalleryOpen(false)} />
 
-      {/* Confirmation dialog */}
-      {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      {/* Confirmation dialog — rendered via portal to escape TabBar stacking context */}
+      {confirmDelete && createPortal(
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-surface border border-border rounded-2xl p-6 w-80 shadow-2xl">
             <div className="text-3xl mb-3 text-center">🗑️</div>
             <h3 className="text-base font-semibold text-text text-center mb-1">
@@ -148,7 +149,8 @@ export function TabBar() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

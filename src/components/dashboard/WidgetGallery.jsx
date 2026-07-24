@@ -4,21 +4,25 @@ import { NEWS_FEEDS } from '../../data/newsFeeds'
 
 const WIDGET_TYPES = [
   { type: 'today',    name: "What's On Today", emoji: '📋', description: 'Morning, arvo, evening planner — resets daily', size: 'Wide' },
-  { type: 'tasks',    name: 'Tasks',          emoji: '✅', description: 'A checklist for today — tick things off', size: 'Wide' },
-  { type: 'notes',    name: 'Quick Note',     emoji: '📝', description: 'Sticky note that auto-saves', size: '' },
-  { type: 'magnets',  name: 'Fridge Board',   emoji: '📌', description: 'Colourful sticky notes on a pinboard', size: 'Wide' },
-  { type: 'clock',    name: 'Clock',          emoji: '🕐', description: 'Live time and date display', size: '' },
-  { type: 'weather',  name: 'Weather',        emoji: '🌤️', description: 'Live conditions, UV, high/low (no API key)', size: '' },
-  { type: 'countdown', name: 'Countdown',     emoji: '⏳', description: 'Count down to EOFY, school holidays, anything', size: '' },
-  { type: 'news',     name: 'News Headlines', emoji: '📰', description: 'Top headlines from Australian news sources', size: 'Wide' },
-  { type: 'quote',    name: 'Daily Quote',    emoji: '💭', description: 'A new motivational quote every day', size: '' },
-  { type: 'calendar', name: 'Calendar',       emoji: '📅', description: 'Monthly calendar view', size: 'Wide' },
-  { type: 'html',     name: 'Custom HTML',    emoji: '🧩', description: 'Embed anything with HTML & JavaScript', size: '' },
+  { type: 'tasks',    name: 'Tasks',           emoji: '✅', description: 'A checklist for today — tick things off', size: 'Wide' },
+  { type: 'notes',    name: 'Quick Note',      emoji: '📝', description: 'Sticky note that auto-saves', size: '' },
+  { type: 'magnets',  name: 'Fridge Board',    emoji: '📌', description: 'Colourful sticky notes on a pinboard', size: 'Wide' },
+  { type: 'clock',    name: 'Clock',           emoji: '🕐', description: 'Live time and date display', size: '' },
+  { type: 'weather',  name: 'Weather',         emoji: '🌤️', description: 'Live conditions, UV, high/low (no API key)', size: '' },
+  { type: 'countdown',name: 'Countdown',       emoji: '⏳', description: 'Count down to EOFY, school holidays, anything', size: '' },
+  { type: 'link',     name: 'Quick Link',      emoji: '🔗', description: 'Pinned shortcut — big icon, opens in a new tab', size: '' },
+  { type: 'webhook',  name: 'Webhook Button',  emoji: '🪝', description: 'A button that fires a HTTP POST/GET to a URL', size: '' },
+  { type: 'news',     name: 'News Headlines',  emoji: '📰', description: 'Top headlines from Australian news sources', size: 'Wide' },
+  { type: 'quote',    name: 'Daily Quote',     emoji: '💭', description: 'A new motivational quote every day', size: '' },
+  { type: 'calendar', name: 'Calendar',        emoji: '📅', description: 'Monthly calendar view', size: 'Wide' },
+  { type: 'html',     name: 'Custom HTML',     emoji: '🧩', description: 'Embed anything with HTML & JavaScript', size: '' },
 ]
 
 export function WidgetGallery({ isOpen, onClose, activeWidgets = [], onToggle }) {
   const [selectedFeedId, setSelectedFeedId] = useState(NEWS_FEEDS[0].id)
   const [htmlContent, setHtmlContent] = useState('')
+  const [linkForm, setLinkForm] = useState({ url: '', label: '', emoji: '🔗' })
+  const [webhookForm, setWebhookForm] = useState({ url: '', label: '', method: 'POST' })
   const [pendingType, setPendingType] = useState(null)
 
   function isActive(type) {
@@ -30,8 +34,10 @@ export function WidgetGallery({ isOpen, onClose, activeWidgets = [], onToggle })
       onToggle(type, null)
       return
     }
-    if (type === 'news') { setPendingType('news'); return }
-    if (type === 'html') { setPendingType('html'); return }
+    if (type === 'news')    { setPendingType('news');    return }
+    if (type === 'html')    { setPendingType('html');    return }
+    if (type === 'link')    { setPendingType('link');    return }
+    if (type === 'webhook') { setPendingType('webhook'); return }
     onToggle(type, null)
   }
 
@@ -44,6 +50,20 @@ export function WidgetGallery({ isOpen, onClose, activeWidgets = [], onToggle })
   function confirmHtml() {
     onToggle('html', { html: htmlContent })
     setHtmlContent('')
+    setPendingType(null)
+  }
+
+  function confirmLink() {
+    if (!linkForm.url.trim()) return
+    onToggle('link', { url: linkForm.url.trim(), label: linkForm.label.trim(), emoji: linkForm.emoji || '🔗' })
+    setLinkForm({ url: '', label: '', emoji: '🔗' })
+    setPendingType(null)
+  }
+
+  function confirmWebhook() {
+    if (!webhookForm.url.trim()) return
+    onToggle('webhook', { url: webhookForm.url.trim(), label: webhookForm.label.trim(), method: webhookForm.method })
+    setWebhookForm({ url: '', label: '', method: 'POST' })
     setPendingType(null)
   }
 
@@ -109,6 +129,66 @@ export function WidgetGallery({ isOpen, onClose, activeWidgets = [], onToggle })
                     <div className="flex gap-2">
                       <button onClick={() => setPendingType(null)} className="flex-1 py-1 text-xs border border-border text-muted rounded-lg hover:text-text">Cancel</button>
                       <button onClick={confirmHtml} className="flex-1 py-1 text-xs bg-accent text-white rounded-lg hover:opacity-90">Add</button>
+                    </div>
+                  </div>
+                )}
+
+                {pendingType === 'link' && wt.type === 'link' && (
+                  <div className="mt-1 space-y-2">
+                    <div className="flex gap-1.5">
+                      <input
+                        value={linkForm.emoji}
+                        onChange={e => setLinkForm(f => ({ ...f, emoji: e.target.value }))}
+                        className="w-9 text-center bg-surface2 border border-border rounded-lg py-1.5 text-sm focus:outline-none focus:border-accent/60"
+                        maxLength={2}
+                      />
+                      <input
+                        value={linkForm.label}
+                        onChange={e => setLinkForm(f => ({ ...f, label: e.target.value }))}
+                        placeholder="Label (optional)"
+                        className="flex-1 bg-surface2 border border-border rounded-lg px-2 py-1.5 text-xs text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60"
+                      />
+                    </div>
+                    <input
+                      value={linkForm.url}
+                      onChange={e => setLinkForm(f => ({ ...f, url: e.target.value }))}
+                      placeholder="https://…"
+                      type="url"
+                      className="w-full bg-surface2 border border-border rounded-lg px-2 py-1.5 text-xs text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60"
+                    />
+                    <div className="flex gap-2">
+                      <button onClick={() => setPendingType(null)} className="flex-1 py-1 text-xs border border-border text-muted rounded-lg hover:text-text">Cancel</button>
+                      <button onClick={confirmLink} disabled={!linkForm.url.trim()} className="flex-1 py-1 text-xs bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-40">Add</button>
+                    </div>
+                  </div>
+                )}
+
+                {pendingType === 'webhook' && wt.type === 'webhook' && (
+                  <div className="mt-1 space-y-2">
+                    <input
+                      value={webhookForm.label}
+                      onChange={e => setWebhookForm(f => ({ ...f, label: e.target.value }))}
+                      placeholder="Button label (e.g. Deploy)"
+                      className="w-full bg-surface2 border border-border rounded-lg px-2 py-1.5 text-xs text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60"
+                    />
+                    <input
+                      value={webhookForm.url}
+                      onChange={e => setWebhookForm(f => ({ ...f, url: e.target.value }))}
+                      placeholder="https://hooks.example.com/…"
+                      type="url"
+                      className="w-full bg-surface2 border border-border rounded-lg px-2 py-1.5 text-xs text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60"
+                    />
+                    <select
+                      value={webhookForm.method}
+                      onChange={e => setWebhookForm(f => ({ ...f, method: e.target.value }))}
+                      className="w-full bg-surface2 border border-border rounded-lg px-2 py-1.5 text-xs text-text focus:outline-none focus:border-accent/60"
+                    >
+                      <option value="POST">POST</option>
+                      <option value="GET">GET</option>
+                    </select>
+                    <div className="flex gap-2">
+                      <button onClick={() => setPendingType(null)} className="flex-1 py-1 text-xs border border-border text-muted rounded-lg hover:text-text">Cancel</button>
+                      <button onClick={confirmWebhook} disabled={!webhookForm.url.trim()} className="flex-1 py-1 text-xs bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-40">Add</button>
                     </div>
                   </div>
                 )}

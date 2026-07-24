@@ -148,7 +148,8 @@ export function AuthForm({ onSignIn, onSignUp }) {
 
       <p className="text-center text-xs text-muted/60 mt-6">
         GYST stores your dashboard layout and links in your account via Firebase.
-        Your email address is held by Firebase Authentication.
+        Your email address is held by Firebase Authentication.{' '}
+        <a href="/privacy" className="underline hover:text-muted transition-colors">Privacy Policy</a>
       </p>
     </div>
   )

@@ -5,6 +5,7 @@ import { useAuth } from './hooks/useAuth'
 const AuthPage = lazy(() => import('./pages/AuthPage'))
 const OnboardingPage = lazy(() => import('./pages/OnboardingPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
 
 function Loading() {
   return (
@@ -51,6 +52,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

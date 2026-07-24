@@ -323,8 +323,6 @@ export const PLATFORM_CATEGORIES = [
       { id: 'iinet', name: 'iiNet', url: 'https://www.iinet.net.au/myiinet', emoji: '📡', color: '#003087', description: 'iiNet internet account management', tags: ['internet', 'nbn', 'australia'], category: 'home-property' },
     ],
   },
-]
-
   {
     id: 'photos',
     name: 'Photos & Memories',

@@ -36,7 +36,7 @@ function CompactFavicon({ url, emoji }) {
   )
 }
 
-export function PlatformCard({ platform, editMode, onRemove, onMove, otherCategories = [], tabId, categoryId, compact = false }) {
+export function PlatformCard({ platform, editMode, onRemove, onMove, otherCategories = [], tabId, categoryId, compact = false, onPreview }) {
   const {
     attributes,
     listeners,
@@ -56,7 +56,11 @@ export function PlatformCard({ platform, editMode, onRemove, onMove, otherCatego
 
   function handleClick() {
     if (editMode) return
-    window.open(platform.url, '_blank', 'noopener,noreferrer')
+    if (onPreview) {
+      onPreview(platform.url)
+    } else {
+      window.open(platform.url, '_blank', 'noopener,noreferrer')
+    }
   }
 
   if (compact) {

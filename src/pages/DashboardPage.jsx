@@ -26,6 +26,7 @@ import { WidgetGallery } from '../components/dashboard/WidgetGallery'
 import { Modal } from '../components/ui/Modal'
 import { getPlatformById } from '../data/platforms'
 import { InfoBar } from '../components/dashboard/InfoBar'
+import { LinkPreviewPanel } from '../components/dashboard/LinkPreviewPanel'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -48,6 +49,7 @@ export default function DashboardPage() {
   } = useDashboardStore()
 
   const [customiseOpen, setCustomiseOpen] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState(null)
   const [addCatOpen, setAddCatOpen] = useState(false)
   const [newCatName, setNewCatName] = useState('')
   const [newCatIcon, setNewCatIcon] = useState('📁')
@@ -72,6 +74,7 @@ export default function DashboardPage() {
   const tabs = state.tabs || []
   const currentTab = tabs.find(t => t.id === (currentTabId || tabs[0]?.id)) || tabs[0]
   const categories = currentTab?.categories || []
+  const isHomeTab = !tabs.length || currentTab?.id === tabs[0]?.id
 
   const appearance = state.appearance || {}
 
@@ -198,15 +201,17 @@ export default function DashboardPage() {
           <InfoBar />
           <SearchBar />
 
-          <WidgetRow
-            tabId={currentTab?.id}
-            widgets={currentTab?.widgets || []}
-            onManage={() => setWidgetGalleryOpen(true)}
-            onRemoveWidget={(wid) => removeWidget(currentTab.id, wid)}
-            onUpdateWidget={handleUpdateWidget}
-            onReorderWidgets={(ws) => currentTab && reorderWidgets(currentTab.id, ws)}
-            onResizeWidget={(wid, size) => currentTab && setWidgetSize(currentTab.id, wid, size)}
-          />
+          {isHomeTab && (
+            <WidgetRow
+              tabId={currentTab?.id}
+              widgets={currentTab?.widgets || []}
+              onManage={() => setWidgetGalleryOpen(true)}
+              onRemoveWidget={(wid) => removeWidget(currentTab.id, wid)}
+              onUpdateWidget={handleUpdateWidget}
+              onReorderWidgets={(ws) => currentTab && reorderWidgets(currentTab.id, ws)}
+              onResizeWidget={(wid, size) => currentTab && setWidgetSize(currentTab.id, wid, size)}
+            />
+          )}
 
           {/* Categories */}
           <div className="px-4">
@@ -225,6 +230,7 @@ export default function DashboardPage() {
                     allCategories={categories}
                     onAddPlatform={() => toggleSidebar()}
                     compact={appearance.linkLayout === 'compact'}
+                    onPreview={setPreviewUrl}
                   />
                 ))}
 
@@ -279,6 +285,11 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Link preview panel */}
+      {previewUrl && (
+        <LinkPreviewPanel url={previewUrl} onClose={() => setPreviewUrl(null)} />
+      )}
 
       {/* Platform sidebar */}
       <PlatformSidebar />

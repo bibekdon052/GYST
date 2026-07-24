@@ -2,18 +2,24 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useDashboardStore } from '../store/dashboardStore'
+import { TAB_TEMPLATES } from '../data/tabTemplates'
 import { StepProfession } from '../components/onboarding/StepProfession'
 import { StepWorkStyle } from '../components/onboarding/StepWorkStyle'
 import { StepCategories } from '../components/onboarding/StepCategories'
 import { StepTutorial } from '../components/onboarding/StepTutorial'
+import { StepTemplates } from '../components/onboarding/StepTemplates'
 
 const STEPS = [
-  { id: 'welcome', label: 'Welcome' },
+  { id: 'welcome',   label: 'Welcome' },
   { id: 'profession', label: 'Role' },
   { id: 'workstyle', label: 'Style' },
   { id: 'categories', label: 'Areas' },
-  { id: 'tutorial', label: 'Tour' },
+  { id: 'tutorial',  label: 'Tour' },
+  { id: 'templates', label: 'Templates' },
 ]
+
+// Steps with their own navigation — hide the shared Back/Continue bar
+const SELF_NAV_STEPS = new Set(['tutorial', 'templates'])
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
@@ -24,12 +30,21 @@ export default function OnboardingPage() {
   const [profession, setProfession] = useState(null)
   const [workStyle, setWorkStyle] = useState(null)
   const [categories, setCategories] = useState([])
+  const [selectedTemplateIds, setSelectedTemplateIds] = useState(new Set())
   const [loading, setLoading] = useState(false)
 
   function toggleCategory(id) {
     setCategories(prev =>
       prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
     )
+  }
+
+  function toggleTemplate(id) {
+    setSelectedTemplateIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
   }
 
   function next() {
@@ -44,7 +59,10 @@ export default function OnboardingPage() {
     if (!user) return
     setLoading(true)
     try {
-      await completeOnboarding(user.uid, profession || 'remote-worker')
+      const extraTemplates = [...selectedTemplateIds]
+        .map(id => TAB_TEMPLATES.find(t => t.id === id))
+        .filter(Boolean)
+      await completeOnboarding(user.uid, profession || 'remote-worker', extraTemplates)
       navigate('/dashboard', { replace: true })
     } catch (err) {
       console.error('Onboarding error:', err)
@@ -55,9 +73,11 @@ export default function OnboardingPage() {
 
   const canNext = () => {
     if (STEPS[step].id === 'profession') return !!profession
-    if (STEPS[step].id === 'workstyle') return !!workStyle
+    if (STEPS[step].id === 'workstyle')  return !!workStyle
     return true
   }
+
+  const currentStepId = STEPS[step].id
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-5">
@@ -100,7 +120,7 @@ export default function OnboardingPage() {
         {/* Card */}
         <div className="bg-surface border border-border rounded-2xl p-6 shadow-2xl shadow-black/30">
           {/* Welcome step */}
-          {STEPS[step].id === 'welcome' && (
+          {currentStepId === 'welcome' && (
             <div className="text-center space-y-4 py-4">
               <div className="text-5xl">👋</div>
               <h2 className="text-2xl font-bold text-text">Welcome to GYST</h2>
@@ -122,24 +142,35 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {STEPS[step].id === 'profession' && (
+          {currentStepId === 'profession' && (
             <StepProfession selected={profession} onSelect={setProfession} />
           )}
 
-          {STEPS[step].id === 'workstyle' && (
+          {currentStepId === 'workstyle' && (
             <StepWorkStyle selected={workStyle} onSelect={setWorkStyle} />
           )}
 
-          {STEPS[step].id === 'categories' && (
+          {currentStepId === 'categories' && (
             <StepCategories selected={categories} onToggle={toggleCategory} />
           )}
 
-          {STEPS[step].id === 'tutorial' && (
-            <StepTutorial onDone={finish} />
+          {/* Tutorial advances to Templates step instead of finishing */}
+          {currentStepId === 'tutorial' && (
+            <StepTutorial onDone={next} />
           )}
 
-          {/* Nav buttons — hidden on tutorial (it has its own) */}
-          {STEPS[step].id !== 'tutorial' && (
+          {currentStepId === 'templates' && (
+            <StepTemplates
+              selectedIds={selectedTemplateIds}
+              onToggle={toggleTemplate}
+              onDone={finish}
+              onBack={prev}
+              loading={loading}
+            />
+          )}
+
+          {/* Shared nav — hidden for self-navigating steps */}
+          {!SELF_NAV_STEPS.has(currentStepId) && (
             <div className="flex justify-between items-center mt-6 pt-4 border-t border-border">
               <button
                 onClick={prev}
@@ -159,7 +190,7 @@ export default function OnboardingPage() {
           )}
         </div>
 
-        {/* Skip link */}
+        {/* Skip link — not shown on the final Templates step */}
         {step < STEPS.length - 1 && (
           <div className="text-center mt-4">
             <button

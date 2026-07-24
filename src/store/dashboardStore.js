@@ -590,18 +590,39 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
-  async completeOnboarding(uid, templateId) {
+  async completeOnboarding(uid, templateId, additionalTabTemplates = []) {
     const newState = buildStateFromTemplate(templateId)
+
+    // Merge any templates the user selected during onboarding
+    const now = Date.now()
+    const extraTabs = additionalTabTemplates.map((tmpl, idx) => ({
+      id: `tab-tmpl-${now}-${idx}`,
+      name: tmpl.name,
+      icon: tmpl.icon,
+      widgets: DEFAULT_TAB_WIDGETS(),
+      categories: tmpl.categories.map((cat, ci) => ({
+        id: `cat-tmpl-${now}-${idx}-${ci}`,
+        name: cat.name,
+        icon: cat.icon,
+        platforms: cat.platformIds.map(pid => getPlatformById(pid)).filter(Boolean),
+        widgets: [],
+      })),
+    }))
+
+    const finalState = extraTabs.length
+      ? { ...newState, tabs: [...newState.tabs, ...extraTabs] }
+      : newState
+
     set({
-      state: newState,
+      state: finalState,
       onboardingComplete: true,
-      currentTabId: newState.tabs[0]?.id || null,
+      currentTabId: finalState.tabs[0]?.id || null,
     })
     try {
       await setDoc(
         doc(db, 'users', uid),
         {
-          state: JSON.stringify(newState),
+          state: JSON.stringify(finalState),
           onboardingComplete: true,
           updatedAt: serverTimestamp(),
         },

@@ -52,6 +52,7 @@ export function WeatherWidget() {
   const [weather, setWeather] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [geoConsent, setGeoConsent] = useState(() => localStorage.getItem('gyst_geo_consent'))
   const intervalRef = useRef(null)
 
   async function load(lat, lon) {
@@ -81,8 +82,22 @@ export function WeatherWidget() {
     intervalRef.current = setInterval(() => load(lat, lon), REFRESH_MS)
   }
 
+  function grantConsent() {
+    localStorage.setItem('gyst_geo_consent', 'granted')
+    setGeoConsent('granted')
+  }
+
+  function denyConsent() {
+    localStorage.setItem('gyst_geo_consent', 'denied')
+    setGeoConsent('denied')
+  }
+
   useEffect(() => {
-    if (navigator.geolocation) {
+    if (geoConsent === null) {
+      setLoading(false)
+      return
+    }
+    if (geoConsent === 'granted' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         pos => startWithCoords(pos.coords.latitude, pos.coords.longitude),
         ()  => startWithCoords(MELBOURNE_LAT, MELBOURNE_LON),
@@ -92,7 +107,33 @@ export function WeatherWidget() {
       startWithCoords(MELBOURNE_LAT, MELBOURNE_LON)
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [])
+  }, [geoConsent])
+
+  /* ── Consent prompt ── */
+  if (geoConsent === null) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full px-4 gap-3 text-center">
+        <div className="text-2xl">📍</div>
+        <p className="text-xs text-muted leading-relaxed max-w-[160px]">
+          Allow location access for local weather, or use Melbourne as default.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={denyConsent}
+            className="px-3 py-1.5 text-xs border border-border text-muted rounded-lg hover:text-text transition-colors"
+          >
+            Melbourne
+          </button>
+          <button
+            onClick={grantConsent}
+            className="px-3 py-1.5 text-xs bg-accent text-white rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Allow
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
@@ -114,25 +155,37 @@ export function WeatherWidget() {
   const uv = uvLabel(weather.uvMax)
 
   return (
-    <div className="flex flex-col justify-center h-full px-4 py-3 gap-1.5">
-      <div className="flex items-baseline gap-2">
-        <span className="text-3xl">{condition.emoji}</span>
-        <span className="text-2xl font-bold text-text">{weather.temp}°C</span>
-        {weather.high != null && weather.low != null && (
-          <span className="text-xs text-muted ml-auto">
-            ↑{weather.high}° ↓{weather.low}°
-          </span>
-        )}
+    <div className="flex flex-col justify-between h-full px-4 py-3">
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl">{condition.emoji}</span>
+          <span className="text-2xl font-bold text-text">{weather.temp}°C</span>
+          {weather.high != null && weather.low != null && (
+            <span className="text-xs text-muted ml-auto">
+              ↑{weather.high}° ↓{weather.low}°
+            </span>
+          )}
+        </div>
+        <div className="text-xs text-muted">
+          Feels like {weather.feels}°C · {condition.label}
+        </div>
+        <div className="flex items-center gap-3 text-xs text-muted">
+          <span>💨 {weather.wind} km/h</span>
+          {uv && (
+            <span className={`font-medium ${uv.color}`}>☀️ {uv.text}</span>
+          )}
+        </div>
       </div>
-      <div className="text-xs text-muted">
-        Feels like {weather.feels}°C · {condition.label}
-      </div>
-      <div className="flex items-center gap-3 text-xs text-muted">
-        <span>💨 {weather.wind} km/h</span>
-        {uv && (
-          <span className={`font-medium ${uv.color}`}>☀️ {uv.text}</span>
-        )}
-      </div>
+
+      {/* Attribution — required by Open-Meteo ToS */}
+      <a
+        href="https://open-meteo.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-[10px] text-muted/40 hover:text-muted/60 self-end"
+      >
+        Open-Meteo
+      </a>
     </div>
   )
 }

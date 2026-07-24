@@ -16,6 +16,9 @@ export function HtmlWidget({ content = '', title = 'HTML Widget', onEdit }) {
             Cancel
           </button>
         </div>
+        <p className="text-[11px] text-amber-500/80">
+          HTML widgets execute JavaScript — only add code you trust.
+        </p>
         <textarea
           value={draft}
           onChange={e => setDraft(e.target.value)}

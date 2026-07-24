@@ -19,6 +19,7 @@ function uvInfo(uv) {
 export function InfoBar() {
   const [now, setNow] = useState(new Date())
   const [weather, setWeather] = useState(null)
+  const [geoConsent, setGeoConsent] = useState(() => localStorage.getItem('gyst_geo_consent'))
   const timerRef = useRef(null)
   const pollRef  = useRef(null)
 
@@ -48,12 +49,23 @@ export function InfoBar() {
     } catch {}
   }
 
+  function grantConsent() {
+    localStorage.setItem('gyst_geo_consent', 'granted')
+    setGeoConsent('granted')
+  }
+
+  function denyConsent() {
+    localStorage.setItem('gyst_geo_consent', 'denied')
+    setGeoConsent('denied')
+  }
+
   useEffect(() => {
+    if (geoConsent === null) return
     function start(lat, lon) {
       fetchWeather(lat, lon)
       pollRef.current = setInterval(() => fetchWeather(lat, lon), 600_000)
     }
-    if (navigator.geolocation) {
+    if (geoConsent === 'granted' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         p  => start(p.coords.latitude, p.coords.longitude),
         () => start(-37.8136, 144.9631),
@@ -63,7 +75,7 @@ export function InfoBar() {
       start(-37.8136, 144.9631)
     }
     return () => clearInterval(pollRef.current)
-  }, [])
+  }, [geoConsent])
 
   const timeStr = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: true })
   const dateStr = now.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
@@ -79,7 +91,21 @@ export function InfoBar() {
           <span className="text-xs text-muted">{dateStr}</span>
         </div>
 
-        {weather && (
+        {/* Geolocation consent prompt — shown once until user decides */}
+        {geoConsent === null && (
+          <>
+            <div className="w-px h-4 bg-border shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs text-muted">
+              <span>📍</span>
+              <span>Local weather?</span>
+              <button onClick={grantConsent} className="text-accent hover:underline font-medium">Allow</button>
+              <span className="text-muted/30">·</span>
+              <button onClick={denyConsent} className="text-muted/60 hover:text-text">Use Melbourne</button>
+            </div>
+          </>
+        )}
+
+        {geoConsent !== null && weather && (
           <>
             <div className="w-px h-4 bg-border shrink-0" />
 
@@ -102,6 +128,16 @@ export function InfoBar() {
             {weather.tz && (
               <span className="text-xs text-muted/60 font-mono">{weather.tz}</span>
             )}
+
+            {/* Attribution — required by Open-Meteo ToS */}
+            <a
+              href="https://open-meteo.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-muted/40 hover:text-muted/60 ml-auto"
+            >
+              Open-Meteo
+            </a>
           </>
         )}
       </div>

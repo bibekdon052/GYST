@@ -131,7 +131,7 @@ export default function OnboardingPage() {
                 {[
                   { icon: '🔗', label: 'All your links' },
                   { icon: '📂', label: 'Organised by you' },
-                  { icon: '🔒', label: 'No data stored' },
+                  { icon: '🔒', label: 'Private & secure' },
                 ].map(f => (
                   <div key={f.label} className="bg-surface2 rounded-xl p-3 text-center">
                     <div className="text-xl mb-1">{f.icon}</div>

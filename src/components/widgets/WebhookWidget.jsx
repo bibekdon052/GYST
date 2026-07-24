@@ -12,7 +12,7 @@ export function WebhookWidget({ widget, onUpdate }) {
 
   function save() {
     const url = form.url.trim()
-    if (!url) return
+    if (!url || !url.startsWith('https://')) return
     onUpdate?.({ url, label: form.label.trim(), method: form.method })
     setEditing(false)
   }
@@ -47,6 +47,9 @@ export function WebhookWidget({ widget, onUpdate }) {
           className="w-full bg-surface2 border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60"
           onKeyDown={e => e.key === 'Enter' && save()}
         />
+        {form.url.trim() && !form.url.trim().startsWith('https://') && (
+          <p className="text-[11px] text-amber-500">URL must start with https://</p>
+        )}
         <select
           value={form.method}
           onChange={e => setForm(f => ({ ...f, method: e.target.value }))}
@@ -57,7 +60,7 @@ export function WebhookWidget({ widget, onUpdate }) {
         </select>
         <button
           onClick={save}
-          disabled={!form.url.trim()}
+          disabled={!form.url.trim() || !form.url.trim().startsWith('https://')}
           className="py-2 bg-accent text-white rounded-lg text-xs font-semibold hover:opacity-90 disabled:opacity-40"
         >
           Save

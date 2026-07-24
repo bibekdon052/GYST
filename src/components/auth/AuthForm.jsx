@@ -147,7 +147,8 @@ export function AuthForm({ onSignIn, onSignUp }) {
       </div>
 
       <p className="text-center text-xs text-muted/60 mt-6">
-        GYST stores only your links and layout. No personal data is collected.
+        GYST stores your dashboard layout and links in your account via Firebase.
+        Your email address is held by Firebase Authentication.
       </p>
     </div>
   )

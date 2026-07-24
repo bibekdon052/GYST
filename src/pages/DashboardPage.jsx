@@ -199,6 +199,7 @@ export default function DashboardPage() {
                     category={category}
                     tabId={currentTab?.id}
                     onAddPlatform={() => toggleSidebar()}
+                    compact={appearance.linkLayout === 'compact'}
                   />
                 ))}
 

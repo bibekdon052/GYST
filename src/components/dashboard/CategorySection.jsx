@@ -6,7 +6,7 @@ import {
 import { useDashboardStore } from '../../store/dashboardStore'
 import { PlatformCard } from './PlatformCard'
 
-export function CategorySection({ category, tabId, onAddPlatform }) {
+export function CategorySection({ category, tabId, onAddPlatform, compact = false }) {
   const { editMode, removePlatform, renameCategory, removeCategory } = useDashboardStore()
   const [renaming, setRenaming] = useState(false)
   const [draftName, setDraftName] = useState(category.name)
@@ -71,7 +71,10 @@ export function CategorySection({ category, tabId, onAddPlatform }) {
         items={category.platforms.map(p => p.id)}
         strategy={rectSortingStrategy}
       >
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
+        <div className={compact
+          ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1.5'
+          : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5'
+        }>
           {category.platforms.map(platform => (
             <PlatformCard
               key={platform.id}
@@ -79,6 +82,7 @@ export function CategorySection({ category, tabId, onAddPlatform }) {
               editMode={editMode}
               tabId={tabId}
               categoryId={category.id}
+              compact={compact}
               onRemove={() => removePlatform(tabId, category.id, platform.id)}
             />
           ))}

@@ -9,8 +9,9 @@ const WIDGET_TYPES = [
   { type: 'weather',  name: 'Weather',        emoji: '🌤️', description: 'Current conditions via Open-Meteo (no API key needed)' },
   { type: 'news',     name: 'News Headlines', emoji: '📰', description: 'Top headlines from Australian news sources' },
   { type: 'quote',    name: 'Daily Quote',    emoji: '💭', description: 'A new motivational quote every day' },
-  { type: 'calendar', name: 'Calendar',       emoji: '📅', description: 'Monthly calendar view' },
-  { type: 'html',     name: 'Custom HTML',    emoji: '🧩', description: 'Embed anything with HTML & JavaScript' },
+  { type: 'countdown', name: 'Countdown',      emoji: '⏳', description: 'Count down to EOFY, school holidays, custom dates' },
+  { type: 'calendar',  name: 'Calendar',      emoji: '📅', description: 'Monthly calendar view' },
+  { type: 'html',      name: 'Custom HTML',   emoji: '🧩', description: 'Embed anything with HTML & JavaScript' },
 ]
 
 export function WidgetGallery({ isOpen, onClose, activeWidgets = [], onToggle }) {

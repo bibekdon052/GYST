@@ -6,6 +6,7 @@ import { CalendarWidget } from '../widgets/CalendarWidget'
 import { HtmlWidget } from '../widgets/HtmlWidget'
 import { TasksWidget } from '../widgets/TasksWidget'
 import { NotesWidget } from '../widgets/NotesWidget'
+import { CountdownWidget } from '../widgets/CountdownWidget'
 
 function getWidgetClasses(type) {
   switch (type) {
@@ -15,8 +16,9 @@ function getWidgetClasses(type) {
     case 'news':     return { card: 'h-48', col: 'md:col-span-2' }
     case 'calendar': return { card: 'h-44', col: 'md:col-span-2' }
     case 'html':     return { card: 'h-40', col: '' }
-    case 'tasks':    return { card: 'h-56',  col: 'md:col-span-2' }
-    case 'notes':    return { card: 'h-44',  col: '' }
+    case 'tasks':     return { card: 'h-56',  col: 'md:col-span-2' }
+    case 'notes':     return { card: 'h-44',  col: '' }
+    case 'countdown': return { card: 'h-56',  col: '' }
     default:         return { card: 'h-32', col: '' }
   }
 }
@@ -43,7 +45,8 @@ function WidgetCard({ widget, onRemove, onUpdate }) {
         {widget.type === 'quote'    && <QuoteWidget widget={widget} />}
         {widget.type === 'calendar' && <CalendarWidget />}
         {widget.type === 'tasks'    && <TasksWidget widget={widget} onUpdate={handleUpdate} />}
-        {widget.type === 'notes'    && <NotesWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'notes'      && <NotesWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'countdown'  && <CountdownWidget widget={widget} onUpdate={handleUpdate} />}
         {widget.type === 'html'     && (
           <HtmlWidget content={widget.config?.html || ''} title="HTML Widget" />
         )}

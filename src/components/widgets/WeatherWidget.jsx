@@ -23,15 +23,25 @@ const WMO = {
   99: { emoji: '⛈️',  label: 'Severe storm' },
 }
 
+function uvLabel(uv) {
+  if (uv == null) return null
+  if (uv <= 2)  return { text: `UV ${uv} Low`,       color: 'text-green-400' }
+  if (uv <= 5)  return { text: `UV ${uv} Moderate`,  color: 'text-yellow-400' }
+  if (uv <= 7)  return { text: `UV ${uv} High`,       color: 'text-orange-400' }
+  if (uv <= 10) return { text: `UV ${uv} Very High`,  color: 'text-red-400' }
+  return             { text: `UV ${uv} Extreme`,      color: 'text-purple-400' }
+}
+
 const MELBOURNE_LAT = -37.8136
 const MELBOURNE_LON = 144.9631
-const REFRESH_MS = 600_000 // 10 minutes
+const REFRESH_MS = 600_000
 
 async function fetchWeather(lat, lon) {
   const url =
     `https://api.open-meteo.com/v1/forecast` +
     `?latitude=${lat}&longitude=${lon}` +
     `&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m` +
+    `&daily=uv_index_max,temperature_2m_max,temperature_2m_min` +
     `&timezone=auto&forecast_days=1`
   const res = await fetch(url)
   if (!res.ok) throw new Error('Weather fetch failed')
@@ -49,11 +59,15 @@ export function WeatherWidget() {
       setError(false)
       const data = await fetchWeather(lat, lon)
       const c = data.current
+      const d = data.daily
       setWeather({
-        temp: Math.round(c.temperature_2m),
-        feels: Math.round(c.apparent_temperature),
-        code: c.weathercode,
-        wind: Math.round(c.windspeed_10m),
+        temp:   Math.round(c.temperature_2m),
+        feels:  Math.round(c.apparent_temperature),
+        code:   c.weathercode,
+        wind:   Math.round(c.windspeed_10m),
+        uvMax:  Math.round(d?.uv_index_max?.[0] ?? null),
+        high:   Math.round(d?.temperature_2m_max?.[0] ?? null),
+        low:    Math.round(d?.temperature_2m_min?.[0] ?? null),
       })
     } catch {
       setError(true)
@@ -77,17 +91,13 @@ export function WeatherWidget() {
     } else {
       startWithCoords(MELBOURNE_LAT, MELBOURNE_LON)
     }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full text-muted text-sm">
-        <div className="animate-spin text-lg mr-2">⏳</div>
-        Loading…
+        <div className="animate-spin text-lg mr-2">⏳</div>Loading…
       </div>
     )
   }
@@ -101,18 +111,27 @@ export function WeatherWidget() {
   }
 
   const condition = WMO[weather.code] || { emoji: '🌡️', label: 'Unknown' }
+  const uv = uvLabel(weather.uvMax)
 
   return (
-    <div className="flex flex-col justify-center h-full px-4 py-3 gap-1">
+    <div className="flex flex-col justify-center h-full px-4 py-3 gap-1.5">
       <div className="flex items-baseline gap-2">
         <span className="text-3xl">{condition.emoji}</span>
         <span className="text-2xl font-bold text-text">{weather.temp}°C</span>
-      </div>
-      <div className="text-xs text-muted leading-relaxed">
-        Feels like {weather.feels}°C · {condition.label}
+        {weather.high != null && weather.low != null && (
+          <span className="text-xs text-muted ml-auto">
+            ↑{weather.high}° ↓{weather.low}°
+          </span>
+        )}
       </div>
       <div className="text-xs text-muted">
-        💨 {weather.wind} km/h
+        Feels like {weather.feels}°C · {condition.label}
+      </div>
+      <div className="flex items-center gap-3 text-xs text-muted">
+        <span>💨 {weather.wind} km/h</span>
+        {uv && (
+          <span className={`font-medium ${uv.color}`}>☀️ {uv.text}</span>
+        )}
       </div>
     </div>
   )

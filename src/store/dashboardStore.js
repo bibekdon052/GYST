@@ -14,6 +14,7 @@ const DEFAULT_APPEARANCE = {
   logoEmoji: '🛩️',
   background: { type: 'color', value: '#0f1117' },
   theme: 'dark',
+  linkLayout: 'grid', // 'grid' | 'compact'
 }
 
 // ─── Default tab-level widgets ──────────────────────────

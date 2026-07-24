@@ -35,7 +35,7 @@ function Toast({ message, type }) {
 }
 
 export function Header({ onOpenCustomise }) {
-  const { state, editMode, sidebarOpen, saveStatus, toggleEditMode, toggleSidebar, exportConfig, importConfig, resetConfig } = useDashboardStore()
+  const { state, editMode, sidebarOpen, saveStatus, toggleEditMode, toggleSidebar, exportConfig, importConfig, resetConfig, updateAppearance } = useDashboardStore()
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
@@ -107,6 +107,34 @@ export function Header({ onOpenCustomise }) {
 
         {/* Actions */}
         <div className="flex items-center gap-1">
+          {/* Compact layout toggle */}
+          {(() => {
+            const isCompact = state.appearance?.linkLayout === 'compact'
+            return (
+              <button
+                onClick={() => updateAppearance({ linkLayout: isCompact ? 'grid' : 'compact' })}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-border text-muted hover:text-text hover:border-accent/40 transition-colors"
+                title={isCompact ? 'Switch to grid layout' : 'Switch to compact layout'}
+              >
+                {isCompact ? (
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="1.5">
+                    <rect x="1" y="1" width="6" height="6" rx="1" />
+                    <rect x="9" y="1" width="6" height="6" rx="1" />
+                    <rect x="1" y="9" width="6" height="6" rx="1" />
+                    <rect x="9" y="9" width="6" height="6" rx="1" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="1.5">
+                    <line x1="1" y1="4" x2="15" y2="4" />
+                    <line x1="1" y1="8" x2="15" y2="8" />
+                    <line x1="1" y1="12" x2="15" y2="12" />
+                  </svg>
+                )}
+                <span className="hidden sm:block">{isCompact ? 'Grid' : 'Compact'}</span>
+              </button>
+            )
+          })()}
+
           {/* Customise */}
           <button
             onClick={onOpenCustomise}

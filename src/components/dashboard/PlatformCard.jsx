@@ -23,7 +23,23 @@ function FaviconIcon({ url, emoji }) {
   )
 }
 
-export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId }) {
+function CompactFavicon({ url, emoji }) {
+  const [failed, setFailed] = useState(false)
+  let hostname = ''
+  try { hostname = url ? new URL(url).hostname : '' } catch { /* invalid */ }
+  if (!hostname || failed) return <span className="text-sm leading-none">{emoji || '🔗'}</span>
+  return (
+    <img
+      src={`https://www.google.com/s2/favicons?sz=32&domain=${hostname}`}
+      alt=""
+      onError={() => setFailed(true)}
+      className="w-4 h-4 rounded object-contain shrink-0"
+      loading="lazy"
+    />
+  )
+}
+
+export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId, compact = false }) {
   const {
     attributes,
     listeners,
@@ -39,9 +55,39 @@ export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId }
     opacity: isDragging ? 0.5 : 1,
   }
 
-  function handleClick(e) {
+  function handleClick() {
     if (editMode) return
     window.open(platform.url, '_blank', 'noopener,noreferrer')
+  }
+
+  if (compact) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`
+          relative group flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/60
+          transition-all duration-150 select-none
+          ${!editMode ? 'cursor-pointer hover:border-accent/50 hover:bg-surface2 active:scale-95' : ''}
+          ${editMode ? 'cursor-grab active:cursor-grabbing border-dashed' : ''}
+          ${isDragging ? 'z-50 shadow-lg opacity-50' : ''}
+        `}
+        onClick={handleClick}
+        {...(editMode ? { ...attributes, ...listeners } : {})}
+      >
+        {editMode && (
+          <button
+            onPointerDown={e => e.stopPropagation()}
+            onClick={e => { e.stopPropagation(); onRemove?.() }}
+            className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger text-white text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow"
+          >
+            ×
+          </button>
+        )}
+        <CompactFavicon url={platform.url} emoji={platform.emoji} />
+        <span className="text-xs font-medium text-text truncate leading-none">{platform.name}</span>
+      </div>
+    )
   }
 
   return (
@@ -58,7 +104,6 @@ export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId }
       onClick={handleClick}
       {...(editMode ? { ...attributes, ...listeners } : {})}
     >
-      {/* Accent bar */}
       {platform.color && (
         <div
           className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full"
@@ -66,7 +111,6 @@ export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId }
         />
       )}
 
-      {/* Remove button */}
       {editMode && (
         <button
           onPointerDown={e => e.stopPropagation()}
@@ -78,17 +122,13 @@ export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId }
         </button>
       )}
 
-      {/* Drag handle indicator */}
       {editMode && (
         <div className="absolute top-1.5 left-2.5 text-muted/40 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
           ⠿
         </div>
       )}
 
-      {/* Favicon / emoji icon */}
       <FaviconIcon url={platform.url} emoji={platform.emoji} />
-
-      {/* Name */}
       <div className="text-xs font-semibold text-text leading-tight pl-1 truncate">{platform.name}</div>
     </div>
   )

@@ -583,6 +583,632 @@ export const TEMPLATES = [
   },
 ]
 
+  // ─── TRADIE ──────────────────────────────────────────────
+  {
+    id: 'tradie',
+    name: 'Tradie / Tradesperson',
+    icon: '🔧',
+    description: 'Quotes, invoices, licensing and supplier platforms',
+    tabs: [
+      {
+        id: 'work',
+        name: 'Work',
+        icon: '🔧',
+        categories: [
+          {
+            id: 'licensing',
+            name: 'Licensing & Compliance',
+            icon: '📋',
+            platformIds: ['safe-work', 'fair-work', 'mygov'],
+          },
+          {
+            id: 'communication',
+            name: 'Communication',
+            icon: '💬',
+            platformIds: ['gmail', 'outlook', 'zoom'],
+          },
+          {
+            id: 'documents',
+            name: 'Documents',
+            icon: '📂',
+            platformIds: ['google-drive', 'onedrive', 'dropbox'],
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        icon: '🏠',
+        categories: [
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'nab', 'paypal'],
+          },
+          {
+            id: 'government',
+            name: 'Government',
+            icon: '🏛️',
+            platformIds: ['mygov', 'ato-online', 'abn-lookup', 'medicare'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── NURSE / AGED CARE ────────────────────────────────────
+  {
+    id: 'nurse',
+    name: 'Nurse / Aged Care',
+    icon: '👩‍⚕️',
+    description: 'Clinical rosters, patient records, professional development',
+    tabs: [
+      {
+        id: 'clinical',
+        name: 'Clinical',
+        icon: '🏥',
+        categories: [
+          {
+            id: 'clinical-portals',
+            name: 'Clinical Portals',
+            icon: '🩺',
+            platformIds: ['myhealth-record', 'medicare', 'mygov'],
+          },
+          {
+            id: 'communication',
+            name: 'Communication',
+            icon: '💬',
+            platformIds: ['microsoft-teams', 'outlook', 'zoom'],
+          },
+          {
+            id: 'learning',
+            name: 'CPD & Learning',
+            icon: '📚',
+            platformIds: ['coursera', 'linkedin-learning'],
+          },
+        ],
+      },
+      {
+        id: 'admin',
+        name: 'Admin',
+        icon: '📊',
+        categories: [
+          {
+            id: 'government',
+            name: 'Government Health',
+            icon: '🏛️',
+            platformIds: ['mygov', 'medicare', 'ndis', 'dva'],
+          },
+          {
+            id: 'insurance',
+            name: 'Health Insurance',
+            icon: '💊',
+            platformIds: ['medibank', 'bupa', 'hcf', 'nib'],
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        icon: '🏠',
+        categories: [
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'up-bank'],
+          },
+          {
+            id: 'wellbeing',
+            name: 'Wellbeing',
+            icon: '💚',
+            platformIds: ['beyond-blue', 'headspace', 'lifeline'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── RETIREE ──────────────────────────────────────────────
+  {
+    id: 'retiree',
+    name: 'Retiree',
+    icon: '🌴',
+    description: 'Government services, health, banking and staying connected',
+    tabs: [
+      {
+        id: 'essentials',
+        name: 'Essentials',
+        icon: '⭐',
+        categories: [
+          {
+            id: 'government',
+            name: 'Government',
+            icon: '🏛️',
+            platformIds: ['mygov', 'centrelink', 'ato-online', 'medicare', 'dva'],
+          },
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'nab', 'westpac'],
+          },
+          {
+            id: 'health',
+            name: 'Health',
+            icon: '🏥',
+            platformIds: ['myhealth-record', 'healthengine', 'hotdoc', 'medibank', 'bupa'],
+          },
+        ],
+      },
+      {
+        id: 'lifestyle',
+        name: 'Lifestyle',
+        icon: '🌿',
+        categories: [
+          {
+            id: 'entertainment',
+            name: 'Entertainment',
+            icon: '🎬',
+            platformIds: ['abc-iview', 'netflix', 'spotify', 'youtube'],
+          },
+          {
+            id: 'connected',
+            name: 'Staying Connected',
+            icon: '💬',
+            platformIds: ['gmail', 'facebook', 'zoom', 'google-meet'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── PARENT / HOMEMAKER ───────────────────────────────────
+  {
+    id: 'parent',
+    name: 'Parent / Homemaker',
+    icon: '👨‍👩‍👧',
+    description: 'School, family admin, health and household',
+    tabs: [
+      {
+        id: 'family',
+        name: 'Family',
+        icon: '👨‍👩‍👧',
+        categories: [
+          {
+            id: 'school',
+            name: 'School',
+            icon: '🏫',
+            platformIds: ['compass', 'google-classroom', 'canvas'],
+          },
+          {
+            id: 'health',
+            name: 'Health',
+            icon: '🏥',
+            platformIds: ['healthengine', 'hotdoc', 'myhealth-record', 'medibank'],
+          },
+          {
+            id: 'shopping',
+            name: 'Shopping',
+            icon: '🛒',
+            platformIds: ['amazon-au', 'ebay-au', 'afterpay'],
+          },
+        ],
+      },
+      {
+        id: 'admin',
+        name: 'Household Admin',
+        icon: '📋',
+        categories: [
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'nab', 'westpac'],
+          },
+          {
+            id: 'government',
+            name: 'Government',
+            icon: '🏛️',
+            platformIds: ['mygov', 'centrelink', 'medicare', 'ato-online'],
+          },
+          {
+            id: 'utilities',
+            name: 'Utilities',
+            icon: '💡',
+            platformIds: ['agl', 'origin-energy', 'telstra'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── SECONDARY STUDENT ────────────────────────────────────
+  {
+    id: 'secondary-student',
+    name: 'Secondary Student',
+    icon: '🎒',
+    description: 'Yr 7–12 school portals, study tools and uni prep',
+    tabs: [
+      {
+        id: 'school',
+        name: 'School',
+        icon: '📚',
+        categories: [
+          {
+            id: 'lms',
+            name: 'School Systems',
+            icon: '🏫',
+            platformIds: ['compass', 'google-classroom', 'canvas', 'moodle'],
+          },
+          {
+            id: 'study',
+            name: 'Study Tools',
+            icon: '✏️',
+            platformIds: ['google-drive', 'youtube', 'khan-academy', 'notion'],
+          },
+          {
+            id: 'communication',
+            name: 'Communication',
+            icon: '💬',
+            platformIds: ['gmail', 'outlook', 'microsoft-teams', 'discord'],
+          },
+        ],
+      },
+      {
+        id: 'future',
+        name: 'Future',
+        icon: '🚀',
+        categories: [
+          {
+            id: 'uni-admissions',
+            name: 'Uni Admissions',
+            icon: '🏛️',
+            platformIds: ['vtac', 'uac', 'qtac', 'satac'],
+          },
+          {
+            id: 'personal',
+            name: 'Personal',
+            icon: '🏠',
+            platformIds: ['mygov', 'centrelink', 'ato-online', 'up-bank'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── FARMER / AGRICULTURAL ────────────────────────────────
+  {
+    id: 'farmer',
+    name: 'Farmer / Agricultural',
+    icon: '🌾',
+    description: 'Rural services, government farm programs and market tools',
+    tabs: [
+      {
+        id: 'farm',
+        name: 'Farm',
+        icon: '🌾',
+        categories: [
+          {
+            id: 'government',
+            name: 'Government & Rural',
+            icon: '🏛️',
+            platformIds: ['mygov', 'ato-online', 'abn-lookup', 'safe-work'],
+          },
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'nab', 'bendigo-bank'],
+          },
+          {
+            id: 'communication',
+            name: 'Communication',
+            icon: '📡',
+            platformIds: ['gmail', 'outlook', 'zoom'],
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        icon: '🏠',
+        categories: [
+          {
+            id: 'services',
+            name: 'Services',
+            icon: '⭐',
+            platformIds: ['mygov', 'centrelink', 'medicare', 'ato-online'],
+          },
+          {
+            id: 'health',
+            name: 'Health',
+            icon: '🏥',
+            platformIds: ['healthengine', 'hotdoc', 'myhealth-record'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── HOSPITALITY / CHEF ───────────────────────────────────
+  {
+    id: 'hospitality',
+    name: 'Hospitality / Chef',
+    icon: '👨‍🍳',
+    description: 'Rosters, recipes, licensing and supplier portals',
+    tabs: [
+      {
+        id: 'work',
+        name: 'Work',
+        icon: '👨‍🍳',
+        categories: [
+          {
+            id: 'compliance',
+            name: 'Compliance',
+            icon: '📋',
+            platformIds: ['safe-work', 'fair-work', 'abn-lookup'],
+          },
+          {
+            id: 'comms',
+            name: 'Communication',
+            icon: '💬',
+            platformIds: ['gmail', 'outlook', 'microsoft-teams'],
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        icon: '🏠',
+        categories: [
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'up-bank', 'paypal'],
+          },
+          {
+            id: 'government',
+            name: 'Government',
+            icon: '🏛️',
+            platformIds: ['mygov', 'ato-online', 'centrelink', 'medicare'],
+          },
+          {
+            id: 'entertainment',
+            name: 'Downtime',
+            icon: '🎬',
+            platformIds: ['youtube', 'spotify', 'netflix', 'abc-iview'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── REAL ESTATE ─────────────────────────────────────────
+  {
+    id: 'real-estate',
+    name: 'Real Estate Agent',
+    icon: '🏡',
+    description: 'Property listings, client comms, compliance',
+    tabs: [
+      {
+        id: 'work',
+        name: 'Work',
+        icon: '🏡',
+        categories: [
+          {
+            id: 'listings',
+            name: 'Property & Listings',
+            icon: '🏠',
+            platformIds: ['realestate-au', 'domain-au'],
+          },
+          {
+            id: 'comms',
+            name: 'Communication',
+            icon: '💬',
+            platformIds: ['gmail', 'outlook', 'zoom', 'microsoft-teams'],
+          },
+          {
+            id: 'docs',
+            name: 'Documents',
+            icon: '📂',
+            platformIds: ['google-drive', 'onedrive', 'dropbox', 'adobe-acrobat'],
+          },
+          {
+            id: 'compliance',
+            name: 'Compliance',
+            icon: '⚖️',
+            platformIds: ['asic', 'fair-work', 'mygov'],
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        icon: '🏠',
+        categories: [
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'nab', 'westpac'],
+          },
+          {
+            id: 'government',
+            name: 'Government',
+            icon: '🏛️',
+            platformIds: ['mygov', 'ato-online', 'medicare', 'vicroads'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── ARTIST / CREATIVE ───────────────────────────────────
+  {
+    id: 'artist',
+    name: 'Artist / Creative',
+    icon: '🎨',
+    description: 'Design tools, portfolio, social media and client portals',
+    tabs: [
+      {
+        id: 'creative',
+        name: 'Creative',
+        icon: '🎨',
+        categories: [
+          {
+            id: 'design-tools',
+            name: 'Design Tools',
+            icon: '✏️',
+            platformIds: ['figma', 'miro', 'adobe-acrobat'],
+          },
+          {
+            id: 'portfolio',
+            name: 'Portfolio & Social',
+            icon: '📸',
+            platformIds: ['instagram', 'linkedin', 'youtube'],
+          },
+          {
+            id: 'client',
+            name: 'Client Work',
+            icon: '🤝',
+            platformIds: ['notion', 'trello', 'loom', 'zoom'],
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        icon: '🏠',
+        categories: [
+          {
+            id: 'banking',
+            name: 'Banking & Payments',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'paypal', 'wise', 'up-bank'],
+          },
+          {
+            id: 'government',
+            name: 'Government',
+            icon: '🏛️',
+            platformIds: ['mygov', 'ato-online', 'abn-lookup', 'medicare'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── SPORTS COACH / PT ────────────────────────────────────
+  {
+    id: 'sports-coach',
+    name: 'Sports Coach / PT',
+    icon: '🏋️',
+    description: 'Session planning, client bookings and sport admin',
+    tabs: [
+      {
+        id: 'coaching',
+        name: 'Coaching',
+        icon: '🏋️',
+        categories: [
+          {
+            id: 'scheduling',
+            name: 'Scheduling & Comms',
+            icon: '📅',
+            platformIds: ['google-calendar', 'zoom', 'gmail', 'microsoft-teams'],
+          },
+          {
+            id: 'compliance',
+            name: 'Compliance & ABN',
+            icon: '📋',
+            platformIds: ['abn-lookup', 'fair-work', 'safe-work', 'mygov'],
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        icon: '🏠',
+        categories: [
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'up-bank', 'paypal'],
+          },
+          {
+            id: 'government',
+            name: 'Government',
+            icon: '🏛️',
+            platformIds: ['mygov', 'ato-online', 'medicare'],
+          },
+          {
+            id: 'wellbeing',
+            name: 'Health & Wellbeing',
+            icon: '💚',
+            platformIds: ['headspace', 'beyond-blue'],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─── ACCOUNTANT ──────────────────────────────────────────
+  {
+    id: 'accountant',
+    name: 'Accountant / Bookkeeper',
+    icon: '📊',
+    description: 'Tax, compliance, client portals and financial tools',
+    tabs: [
+      {
+        id: 'work',
+        name: 'Work',
+        icon: '📊',
+        categories: [
+          {
+            id: 'ato-portals',
+            name: 'ATO & Compliance',
+            icon: '🏛️',
+            platformIds: ['ato-online', 'mygov', 'asic', 'abn-lookup', 'asic-connect'],
+          },
+          {
+            id: 'productivity',
+            name: 'Productivity',
+            icon: '📋',
+            platformIds: ['microsoft-365', 'google-workspace', 'notion', 'sharepoint'],
+          },
+          {
+            id: 'comms',
+            name: 'Communication',
+            icon: '💬',
+            platformIds: ['outlook', 'microsoft-teams', 'zoom', 'gmail'],
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        icon: '🏠',
+        categories: [
+          {
+            id: 'banking',
+            name: 'Banking',
+            icon: '🏦',
+            platformIds: ['commonwealth-bank', 'anz', 'nab', 'westpac', 'macquarie'],
+          },
+          {
+            id: 'government',
+            name: 'Government',
+            icon: '🏛️',
+            platformIds: ['mygov', 'ato-online', 'medicare', 'centrelink'],
+          },
+        ],
+      },
+    ],
+  },
+]
+
 export function getTemplateById(id) {
   return TEMPLATES.find(t => t.id === id) || null
 }

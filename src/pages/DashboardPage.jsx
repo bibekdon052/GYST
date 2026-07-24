@@ -69,18 +69,35 @@ export default function DashboardPage() {
   const currentTab = tabs.find(t => t.id === (currentTabId || tabs[0]?.id)) || tabs[0]
   const categories = currentTab?.categories || []
 
-  // Build background CSS
   const appearance = state.appearance || {}
-  const bgStyle = appearance.background?.type === 'color'
-    ? { backgroundColor: appearance.background.value }
-    : { backgroundColor: '#0f1117' }
 
-  // Dynamic accent
+  // Apply theme, accent, font to document
+  useEffect(() => {
+    const theme = appearance.theme || 'dark'
+    document.documentElement.dataset.theme = theme
+  }, [appearance.theme])
+
   useEffect(() => {
     if (appearance.accentColor) {
-      document.documentElement.style.setProperty('--accent-dynamic', appearance.accentColor)
+      const hex = appearance.accentColor.replace('#', '')
+      const r = parseInt(hex.substring(0, 2), 16)
+      const g = parseInt(hex.substring(2, 4), 16)
+      const b = parseInt(hex.substring(4, 6), 16)
+      if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+        document.documentElement.style.setProperty('--color-accent', `${r} ${g} ${b}`)
+      }
     }
   }, [appearance.accentColor])
+
+  useEffect(() => {
+    const font = appearance.fontFamily || 'system-ui, sans-serif'
+    document.documentElement.style.setProperty('--font-body', font)
+  }, [appearance.fontFamily])
+
+  useEffect(() => {
+    const customBg = appearance.background?.value
+    document.body.style.background = customBg || ''
+  }, [appearance.background])
 
   function handleDragStart(event) {
     setActiveDragId(event.active.id)
@@ -160,7 +177,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen" style={bgStyle}>
+    <div className="min-h-screen bg-bg">
       {/* Fixed header */}
       <Header onOpenCustomise={() => setCustomiseOpen(true)} />
 

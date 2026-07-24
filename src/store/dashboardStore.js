@@ -12,9 +12,10 @@ const DEFAULT_APPEARANCE = {
   siteTitle: 'GYST',
   siteSubtitle: 'Get Your Stuff Together',
   logoEmoji: '🛩️',
-  background: { type: 'color', value: '#0f1117' },
+  background: { type: 'color', value: '' },
   theme: 'dark',
   linkLayout: 'grid', // 'grid' | 'compact'
+  displayName: '',   // greeting name override
 }
 
 // ─── Default tab-level widgets ──────────────────────────

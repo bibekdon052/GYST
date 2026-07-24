@@ -325,6 +325,21 @@ export const PLATFORM_CATEGORIES = [
   },
 ]
 
+  {
+    id: 'photos',
+    name: 'Photos & Memories',
+    icon: '📷',
+    platforms: [
+      { id: 'google-photos', name: 'Google Photos', url: 'https://photos.google.com', emoji: '📷', color: '#4285F4', description: 'Google Photos library', tags: ['photos', 'google', 'memories', 'backup'], category: 'photos' },
+      { id: 'icloud-photos', name: 'iCloud Photos', url: 'https://www.icloud.com/photos', emoji: '🍎', color: '#1C1C1E', description: 'Apple iCloud photo library', tags: ['photos', 'apple', 'icloud', 'memories'], category: 'photos' },
+      { id: 'amazon-photos', name: 'Amazon Photos', url: 'https://www.amazon.com.au/photos', emoji: '🌟', color: '#FF9900', description: 'Amazon unlimited photo storage', tags: ['photos', 'amazon', 'backup', 'memories'], category: 'photos' },
+      { id: 'flickr', name: 'Flickr', url: 'https://www.flickr.com', emoji: '📸', color: '#FF0084', description: 'Photo sharing and community', tags: ['photos', 'sharing', 'creative'], category: 'photos' },
+      { id: 'onedrive-photos', name: 'OneDrive Photos', url: 'https://onedrive.live.com/photos', emoji: '☁️', color: '#0078D4', description: 'Microsoft OneDrive photo albums', tags: ['photos', 'microsoft', 'onedrive', 'memories'], category: 'photos' },
+      { id: 'google-drive-photos', name: 'Drive (Photos)', url: 'https://drive.google.com', emoji: '📂', color: '#4285F4', description: 'Photos stored in Google Drive', tags: ['photos', 'google', 'drive', 'storage'], category: 'photos' },
+    ],
+  },
+]
+
 // Flat list of all platforms for search
 export const ALL_PLATFORMS = PLATFORM_CATEGORIES.flatMap(cat => cat.platforms)
 

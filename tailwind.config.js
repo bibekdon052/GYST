@@ -4,18 +4,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: '#0f1117',
-        surface: '#1a1d27',
-        surface2: '#22263a',
-        border: '#2e3247',
-        text: '#e2e5f0',
-        muted: '#6b7280',
-        accent: '#4f8ef7',
-        danger: '#f87171',
-        success: '#22c55e',
+        bg:       'rgb(var(--color-bg) / <alpha-value>)',
+        surface:  'rgb(var(--color-surface) / <alpha-value>)',
+        surface2: 'rgb(var(--color-surface2) / <alpha-value>)',
+        border:   'rgb(var(--color-border) / <alpha-value>)',
+        text:     'rgb(var(--color-text) / <alpha-value>)',
+        muted:    'rgb(var(--color-muted) / <alpha-value>)',
+        accent:   'rgb(var(--color-accent) / <alpha-value>)',
+        danger:   '#f87171',
+        success:  '#22c55e',
       },
       fontFamily: {
-        sans: ['system-ui', 'sans-serif'],
+        sans: ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
     },
   },

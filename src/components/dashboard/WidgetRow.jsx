@@ -7,19 +7,23 @@ import { HtmlWidget } from '../widgets/HtmlWidget'
 import { TasksWidget } from '../widgets/TasksWidget'
 import { NotesWidget } from '../widgets/NotesWidget'
 import { CountdownWidget } from '../widgets/CountdownWidget'
+import { MagnetBoardWidget } from '../widgets/MagnetBoardWidget'
+import { TodayWidget } from '../widgets/TodayWidget'
 
 function getWidgetClasses(type) {
   switch (type) {
-    case 'clock':    return { card: 'h-32', col: '' }
-    case 'quote':    return { card: 'h-32', col: '' }
-    case 'weather':  return { card: 'h-36', col: '' }
-    case 'news':     return { card: 'h-48', col: 'md:col-span-2' }
-    case 'calendar': return { card: 'h-44', col: 'md:col-span-2' }
-    case 'html':     return { card: 'h-40', col: '' }
-    case 'tasks':     return { card: 'h-56',  col: 'md:col-span-2' }
-    case 'notes':     return { card: 'h-44',  col: '' }
-    case 'countdown': return { card: 'h-56',  col: '' }
-    default:         return { card: 'h-32', col: '' }
+    case 'clock':    return { card: 'h-32',  col: '' }
+    case 'quote':    return { card: 'h-32',  col: '' }
+    case 'weather':  return { card: 'h-36',  col: '' }
+    case 'news':     return { card: 'h-48',  col: 'md:col-span-2' }
+    case 'calendar': return { card: 'h-44',  col: 'md:col-span-2' }
+    case 'html':     return { card: 'h-40',  col: '' }
+    case 'tasks':    return { card: 'h-56',  col: 'md:col-span-2' }
+    case 'notes':    return { card: 'h-44',  col: '' }
+    case 'countdown':return { card: 'h-56',  col: '' }
+    case 'magnets':  return { card: 'h-64',  col: 'md:col-span-2' }
+    case 'today':    return { card: 'h-72',  col: 'md:col-span-2' }
+    default:         return { card: 'h-32',  col: '' }
   }
 }
 
@@ -45,8 +49,10 @@ function WidgetCard({ widget, onRemove, onUpdate }) {
         {widget.type === 'quote'    && <QuoteWidget widget={widget} />}
         {widget.type === 'calendar' && <CalendarWidget />}
         {widget.type === 'tasks'    && <TasksWidget widget={widget} onUpdate={handleUpdate} />}
-        {widget.type === 'notes'      && <NotesWidget widget={widget} onUpdate={handleUpdate} />}
-        {widget.type === 'countdown'  && <CountdownWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'notes'    && <NotesWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'countdown'&& <CountdownWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'magnets'  && <MagnetBoardWidget widget={widget} onUpdate={handleUpdate} />}
+        {widget.type === 'today'    && <TodayWidget widget={widget} onUpdate={handleUpdate} />}
         {widget.type === 'html'     && (
           <HtmlWidget content={widget.config?.html || ''} title="HTML Widget" />
         )}
@@ -82,7 +88,6 @@ export function WidgetRow({ tabId, widgets = [], onManage, onRemoveWidget, onUpd
           />
         ))}
 
-        {/* Manage button */}
         <div className="flex items-center justify-center h-32">
           <button
             onClick={onManage}

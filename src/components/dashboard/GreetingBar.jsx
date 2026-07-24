@@ -1,16 +1,24 @@
+import { useDashboardStore } from '../../store/dashboardStore'
+
 export function GreetingBar({ user }) {
+  const { state } = useDashboardStore()
+  const displayName = state.appearance?.displayName?.trim()
+
   const now = new Date()
   const hour = now.getHours()
-  const dayOfWeek = now.getDay() // 0 = Sunday
+  const dayOfWeek = now.getDay()
   const dayOfYear = Math.floor(
     (now - new Date(now.getFullYear(), 0, 0)) / 86400000
   )
 
-  // Extract first name from email
-  const email = user?.email || ''
-  const localPart = email.split('@')[0] || 'there'
-  const firstName = localPart.split('.')[0]
-  const name = firstName.charAt(0).toUpperCase() + firstName.slice(1)
+  // Name: custom override > email first name > fallback
+  let name = displayName
+  if (!name) {
+    const email = user?.email || ''
+    const localPart = email.split('@')[0] || 'there'
+    const firstName = localPart.split('.')[0]
+    name = firstName.charAt(0).toUpperCase() + firstName.slice(1)
+  }
 
   // Time-based greeting
   let greeting = ''
@@ -19,7 +27,7 @@ export function GreetingBar({ user }) {
     greeting = 'Good morning'
     greetingEmoji = dayOfYear % 2 === 0 ? '🌅' : '☀️'
   } else if (hour >= 12 && hour < 17) {
-    greeting = 'Good afternoon'
+    greeting = 'Good arvo'
     greetingEmoji = '☀️'
   } else if (hour >= 17 && hour < 21) {
     greeting = 'Good evening'
@@ -29,36 +37,14 @@ export function GreetingBar({ user }) {
     greetingEmoji = '🌙'
   }
 
-  // Day-specific sub-messages
   const DAY_MESSAGES = {
-    0: [ // Sunday
-      'Recharge day! Rest, reflect, reset 🌿',
-      'Sunday vibes 😊',
-    ],
-    1: [ // Monday
-      'New week, fresh start. Let\'s get it! 🚀',
-      'Making Mondays matter 💪',
-    ],
-    2: [ // Tuesday
-      'Tuesday energy activated ⚡',
-      'Tuesdays are underrated 🔥',
-    ],
-    3: [ // Wednesday
-      'Midweek champion! You\'re halfway there 🎯',
-      'Midweek momentum — keep it going 💫',
-    ],
-    4: [ // Thursday
-      'Almost there! One more push 💪',
-      'Thursday hustle mode on 🏃',
-    ],
-    5: [ // Friday
-      'TGIF! Finish strong then enjoy the weekend 🎉',
-      'Friday feeling 🥳',
-    ],
-    6: [ // Saturday
-      'Weekend mode: ON 🎊',
-      'Enjoy your Saturday ☀️',
-    ],
+    0: ['Recharge day! Rest, reflect, reset 🌿', 'Sunday vibes — take it slow 😌'],
+    1: ['New week, fresh start. Let\'s get it! 🚀', 'Making Mondays matter 💪'],
+    2: ['Tuesday energy activated ⚡', 'Tuesdays are underrated 🔥'],
+    3: ['Midweek! You\'re halfway there 🎯', 'Midweek momentum — keep it going 💫'],
+    4: ['Almost Friday! One more push 💪', 'Thursday hustle mode 🏃'],
+    5: ['TGIF! Finish strong, enjoy the weekend 🎉', 'Friday feeling 🥳'],
+    6: ['Weekend mode: ON 🎊', 'Enjoy your Saturday ☀️'],
   }
 
   const messages = DAY_MESSAGES[dayOfWeek] || DAY_MESSAGES[0]

@@ -71,12 +71,12 @@ export function WidgetGallery({ isOpen, onClose, activeWidgets = [], onToggle })
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Widget Gallery" width="max-w-lg">
-      <div className="space-y-4">
-        <p className="text-xs text-muted">
+      <div className="flex flex-col gap-3" style={{ maxHeight: 'calc(80vh - 120px)' }}>
+        <p className="text-xs text-muted shrink-0">
           Add widgets above your categories. All default widgets are free — no API keys needed.
         </p>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
           {WIDGET_TYPES.map(wt => {
             const active = isActive(wt.type)
             return (
@@ -212,7 +212,7 @@ export function WidgetGallery({ isOpen, onClose, activeWidgets = [], onToggle })
           })}
         </div>
 
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-end pt-1 shrink-0">
           <button onClick={onClose} className="px-5 py-2 text-sm bg-accent text-white rounded-lg hover:opacity-90">
             Done
           </button>

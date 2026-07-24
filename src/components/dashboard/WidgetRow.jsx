@@ -106,7 +106,6 @@ function SortableWidgetCard({ widget, onRemove, onUpdate, onResize }) {
         {...listeners}
         className="absolute top-1.5 left-1.5 z-10 w-5 h-5 flex items-center justify-center text-muted/30 hover:text-muted/70 cursor-grab active:cursor-grabbing rounded text-[9px] opacity-0 group-hover:opacity-100 transition-all select-none"
         title="Drag to reorder"
-        onPointerDown={e => e.stopPropagation()}
       >
         ⠿
       </button>
@@ -211,17 +210,6 @@ export function WidgetRow({
                 onResize={onResizeWidget}
               />
             ))}
-
-            {/* Always-visible add button */}
-            <div className="h-36 flex items-center justify-center">
-              <button
-                onClick={onManage}
-                className="flex flex-col items-center gap-1.5 text-xs border border-dashed border-border text-muted hover:text-accent hover:border-accent/40 hover:bg-surface/30 rounded-2xl transition-all w-full h-full justify-center"
-              >
-                <span className="text-xl">＋</span>
-                <span>Add Widget</span>
-              </button>
-            </div>
           </div>
         </SortableContext>
 
@@ -236,6 +224,17 @@ export function WidgetRow({
           )}
         </DragOverlay>
       </DndContext>
+
+      {/* Add button lives outside DndContext so sensor events never touch it */}
+      <div className="mt-3">
+        <button
+          onClick={onManage}
+          className="flex items-center gap-2 px-4 py-2 text-xs border border-dashed border-border text-muted hover:text-accent hover:border-accent/40 hover:bg-surface/30 rounded-xl transition-all"
+        >
+          <span className="text-base">＋</span>
+          Add Widget
+        </button>
+      </div>
     </div>
   )
 }

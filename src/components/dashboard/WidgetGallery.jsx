@@ -5,6 +5,8 @@ import { NEWS_FEEDS } from '../../data/newsFeeds'
 const WIDGET_TYPES = [
   { type: 'today',    name: "What's On Today", emoji: '📋', description: 'Morning, arvo, evening planner — resets daily', size: 'Wide' },
   { type: 'tasks',    name: 'Tasks',           emoji: '✅', description: 'A checklist for today — tick things off', size: 'Wide' },
+  { type: 'habits',   name: 'Habit Tracker',   emoji: '🔥', description: '14-day dot grid with streak counters', size: 'Wide' },
+  { type: 'focus',    name: 'Focus Timer',     emoji: '⏱️', description: 'Pomodoro timer — 25, 45 or 90 min sessions', size: '' },
   { type: 'notes',    name: 'Quick Note',      emoji: '📝', description: 'Sticky note that auto-saves', size: '' },
   { type: 'magnets',  name: 'Fridge Board',    emoji: '📌', description: 'Colourful sticky notes on a pinboard', size: 'Wide' },
   { type: 'clock',    name: 'Clock',           emoji: '🕐', description: 'Live time and date display', size: '' },

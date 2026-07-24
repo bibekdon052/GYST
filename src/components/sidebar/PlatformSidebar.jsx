@@ -3,10 +3,10 @@ import { useDashboardStore } from '../../store/dashboardStore'
 import { PLATFORM_CATEGORIES, searchPlatforms } from '../../data/platforms'
 
 export function PlatformSidebar() {
-  const { sidebarOpen, toggleSidebar, state, currentTabId, addPlatform } = useDashboardStore()
-  const [query, setQuery] = useState('')
+  const { sidebarOpen, toggleSidebar, state, currentTabId, addPlatform, addCategory, movePlatform } = useDashboardStore()
+  const [query, setQuery]       = useState('')
   const [filterCat, setFilterCat] = useState('all')
-  const [addTarget, setAddTarget] = useState(null) // { platformId }
+  const [addTarget, setAddTarget] = useState(null)
   const [targetCatId, setTargetCatId] = useState('')
 
   const results = useMemo(() => {
@@ -20,12 +20,27 @@ export function PlatformSidebar() {
   const categories = currentTab?.categories || []
 
   function handleAdd(platform) {
-    if (categories.length === 0) return
+    if (!currentTab) return
+
+    // No categories — auto-create one so the link has somewhere to go
+    if (categories.length === 0) {
+      addCategory(currentTab.id, {
+        id: `cat-general-${Date.now()}`,
+        name: 'General',
+        icon: '📌',
+        platforms: [platform],
+        widgets: [],
+      })
+      return
+    }
+
+    // Single category — add directly
     if (categories.length === 1) {
       addPlatform(currentTab.id, categories[0].id, platform)
       return
     }
-    // Show category picker
+
+    // Multiple categories — show picker
     setAddTarget(platform)
     setTargetCatId(categories[0]?.id || '')
   }
@@ -47,7 +62,8 @@ export function PlatformSidebar() {
       />
 
       {/* Sidebar panel */}
-      <aside className="fixed right-0 top-25 bottom-0 z-30 w-72 bg-surface border-l border-border flex flex-col overflow-hidden shadow-2xl shadow-black/30"
+      <aside
+        className="fixed right-0 bottom-0 z-30 w-72 bg-surface border-l border-border flex flex-col overflow-hidden shadow-2xl shadow-black/30"
         style={{ top: '100px' }}
       >
         {/* Header */}
@@ -118,13 +134,13 @@ export function PlatformSidebar() {
           ))}
         </div>
 
-        {/* Category picker modal */}
+        {/* Category picker overlay */}
         {addTarget && categories.length > 1 && (
           <div className="absolute inset-0 bg-surface/95 backdrop-blur-sm flex flex-col p-5 gap-4">
             <div>
               <h3 className="text-sm font-bold text-text">Add to which category?</h3>
               <p className="text-xs text-muted mt-1">
-                Adding <strong className="text-text">{addTarget.name}</strong> to the current tab
+                Adding <strong className="text-text">{addTarget.name}</strong>
               </p>
             </div>
             <select

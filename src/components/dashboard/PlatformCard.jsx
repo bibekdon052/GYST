@@ -4,14 +4,11 @@ import { CSS } from '@dnd-kit/utilities'
 
 function FaviconIcon({ url, emoji }) {
   const [failed, setFailed] = useState(false)
-
   let hostname = ''
   try { hostname = url ? new URL(url).hostname : '' } catch { /* invalid url */ }
-
   if (!hostname || failed) {
     return <span className="text-2xl leading-none pl-1">{emoji || '🔗'}</span>
   }
-
   return (
     <img
       src={`https://www.google.com/s2/favicons?sz=64&domain=${hostname}`}
@@ -39,7 +36,7 @@ function CompactFavicon({ url, emoji }) {
   )
 }
 
-export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId, compact = false }) {
+export function PlatformCard({ platform, editMode, onRemove, onMove, otherCategories = [], tabId, categoryId, compact = false }) {
   const {
     attributes,
     listeners,
@@ -48,6 +45,8 @@ export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId, 
     transition,
     isDragging,
   } = useSortable({ id: platform.id, disabled: !editMode })
+
+  const [showMoveMenu, setShowMoveMenu] = useState(false)
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -111,6 +110,7 @@ export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId, 
         />
       )}
 
+      {/* Remove button */}
       {editMode && (
         <button
           onPointerDown={e => e.stopPropagation()}
@@ -128,13 +128,46 @@ export function PlatformCard({ platform, editMode, onRemove, tabId, categoryId, 
         </div>
       )}
 
+      {/* Move-to button (edit mode, only when other categories exist) */}
+      {editMode && otherCategories.length > 0 && (
+        <div className="absolute bottom-1.5 right-1.5 z-20">
+          <button
+            onPointerDown={e => e.stopPropagation()}
+            onClick={e => { e.stopPropagation(); setShowMoveMenu(m => !m) }}
+            className="text-[9px] text-muted/40 hover:text-accent opacity-0 group-hover:opacity-100 transition-all px-1.5 py-0.5 rounded bg-surface2/60 hover:bg-surface2"
+            title="Move to another category"
+          >
+            Move →
+          </button>
+          {showMoveMenu && (
+            <div className="absolute bottom-full right-0 mb-1 bg-surface border border-border rounded-xl shadow-xl shadow-black/30 overflow-hidden min-w-[140px] z-30">
+              <p className="text-[10px] text-muted px-3 py-1.5 border-b border-border">Move to…</p>
+              {otherCategories.map(cat => (
+                <button
+                  key={cat.id}
+                  onPointerDown={e => e.stopPropagation()}
+                  onClick={e => {
+                    e.stopPropagation()
+                    onMove?.(cat.id)
+                    setShowMoveMenu(false)
+                  }}
+                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-surface2 transition-colors"
+                >
+                  <span>{cat.icon}</span>
+                  <span className="truncate">{cat.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <FaviconIcon url={platform.url} emoji={platform.emoji} />
       <div className="text-xs font-semibold text-text leading-tight pl-1 truncate">{platform.name}</div>
     </div>
   )
 }
 
-// A ghost placeholder while dragging
 export function PlatformCardGhost() {
   return (
     <div className="bg-surface2 border border-dashed border-border rounded-xl p-3 h-[72px] opacity-40" />

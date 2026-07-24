@@ -341,6 +341,66 @@ export const useDashboardStore = create((set, get) => ({
     get().saveToFirestore()
   },
 
+  // Move a platform from one category to another within the same tab
+  movePlatform(tabId, fromCatId, toCatId, platformId) {
+    set(s => {
+      let movedPlatform = null
+      const tabs = s.state.tabs.map(tab => {
+        if (tab.id !== tabId) return tab
+        // Extract the platform from the source category
+        const categories = tab.categories.map(cat => {
+          if (cat.id === fromCatId) {
+            movedPlatform = cat.platforms.find(p => p.id === platformId) || movedPlatform
+            return { ...cat, platforms: cat.platforms.filter(p => p.id !== platformId) }
+          }
+          return cat
+        })
+        // Add it to the destination category
+        return {
+          ...tab,
+          categories: categories.map(cat => {
+            if (cat.id === toCatId && movedPlatform) {
+              if (cat.platforms.some(p => p.id === platformId)) return cat
+              return { ...cat, platforms: [...cat.platforms, movedPlatform] }
+            }
+            return cat
+          }),
+        }
+      })
+      return { state: { ...s.state, tabs } }
+    })
+    get().saveToFirestore()
+  },
+
+  // Reorder widgets within a tab
+  reorderWidgets(tabId, widgets) {
+    set(s => {
+      const tabs = s.state.tabs.map(tab => {
+        if (tab.id !== tabId) return tab
+        return { ...tab, widgets }
+      })
+      return { state: { ...s.state, tabs } }
+    })
+    get().saveToFirestore()
+  },
+
+  // Set a widget's column size override
+  setWidgetSize(tabId, widgetId, size) {
+    set(s => {
+      const tabs = s.state.tabs.map(tab => {
+        if (tab.id !== tabId) return tab
+        return {
+          ...tab,
+          widgets: (tab.widgets || []).map(w =>
+            w.id === widgetId ? { ...w, size } : w
+          ),
+        }
+      })
+      return { state: { ...s.state, tabs } }
+    })
+    get().saveToFirestore()
+  },
+
   // ─── Category-level widget mutations ──────────────────
   addCategoryWidget(tabId, categoryId, widget) {
     set(s => {

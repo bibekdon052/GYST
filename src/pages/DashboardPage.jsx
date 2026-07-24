@@ -43,6 +43,8 @@ export default function DashboardPage() {
     addWidget,
     removeWidget,
     updateWidget,
+    reorderWidgets,
+    setWidgetSize,
   } = useDashboardStore()
 
   const [customiseOpen, setCustomiseOpen] = useState(false)
@@ -202,6 +204,8 @@ export default function DashboardPage() {
             onManage={() => setWidgetGalleryOpen(true)}
             onRemoveWidget={(wid) => removeWidget(currentTab.id, wid)}
             onUpdateWidget={handleUpdateWidget}
+            onReorderWidgets={(ws) => currentTab && reorderWidgets(currentTab.id, ws)}
+            onResizeWidget={(wid, size) => currentTab && setWidgetSize(currentTab.id, wid, size)}
           />
 
           {/* Categories */}
@@ -218,6 +222,7 @@ export default function DashboardPage() {
                     key={category.id}
                     category={category}
                     tabId={currentTab?.id}
+                    allCategories={categories}
                     onAddPlatform={() => toggleSidebar()}
                     compact={appearance.linkLayout === 'compact'}
                   />
